@@ -1,0 +1,5 @@
+
+include   ':Hack TJ Base'
+project(':Hack TJ Base').projectDir = new File('C:/Hack TJ/Hack TJ Base')
+
+rootProject.name = 'Hack TJ Server'
