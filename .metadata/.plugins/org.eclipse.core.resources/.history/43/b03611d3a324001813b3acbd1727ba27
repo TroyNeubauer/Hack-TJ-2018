@@ -1,0 +1,56 @@
+package com.troy.diplo.map;
+
+import java.util.*;
+
+import com.troy.diplo.game.*;
+import com.troy.diplo.util.DiploColor;
+
+/**
+ * Represents a team of players in one or more diplo games. Only one instance of this class exists for a unique set of players
+ * @author Troy Neubauer
+ *
+ */
+public class Team extends DefaultGameObj {
+
+	private DiploColor color;
+	private List<Account> owners = new ArrayList<Account>();
+	private List<Game> games = new ArrayList<Game>();
+	
+	public Team() {
+	}
+
+	public Team(DiploColor color) {
+		this.color = color;
+		this.owners = new ArrayList<Account>();
+	}
+
+    public Team(DiploColor color, Account... members) {
+        this.color = color;
+        this.owners = Arrays.asList(members);
+    }
+
+	public DiploColor getColor() {
+		return color;
+	}
+
+	public void setColor(DiploColor color) {
+		this.color = color;
+	}
+
+	public List<Account> getOwners() {
+		return owners;
+	}
+
+	public List<Game> getGames() {
+		return games;
+	}
+
+	public boolean isSoloTeam() {
+		return owners.size() == 1;
+	}
+	
+	public boolean isOnTeam(Account account) {
+		return owners.contains(account);
+	}
+
+}

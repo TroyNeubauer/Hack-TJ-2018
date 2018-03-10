@@ -1,0 +1,22 @@
+package com.troy.diplo.map.province;
+
+import com.troy.diplo.map.TeamGame;
+
+/**
+ * Represents the occupancy of a province during a specific turn in a specific game
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class ProvinceData {
+	private TeamGame occupant;
+
+	public ProvinceData(TeamGame occupant) {
+		this.occupant = occupant;
+	}
+
+	public TeamGame getOccupant() {
+		return occupant;
+	}
+
+}

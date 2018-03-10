@@ -1,0 +1,11 @@
+package com.troy.hacjtj.packet;
+
+import com.troy.diplo.map.Map;
+
+public class CreateMapRequest extends CreateRequest<Map, CreateMapData> {
+
+	public CreateMapRequest(long packetID, CreateMapData data) {
+		super(Map.class, packetID, data);
+	}
+
+}

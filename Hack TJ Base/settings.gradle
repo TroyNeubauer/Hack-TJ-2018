@@ -1,2 +1,5 @@
 
+include   ':Troy Berry Core'
+project(':Troy Berry Core').projectDir = new File('C:/Java/Current Projects/Troy Berry Core')
+
 rootProject.name = 'Hack TJ Base'

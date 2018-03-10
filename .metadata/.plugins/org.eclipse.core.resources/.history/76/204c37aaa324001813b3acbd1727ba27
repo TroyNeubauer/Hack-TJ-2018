@@ -1,0 +1,33 @@
+package com.troy.diplo.map.province;
+
+import com.troyberry.math.*;
+
+public class Position2D implements Position {
+
+	private Vector2f position;
+
+	private boolean enabled3D;
+
+	public Position2D(Vector2f position) {
+		this(position, true);
+	}
+
+	public Position2D(Vector2f position, boolean enabled3D) {
+		this.position = position;
+		this.enabled3D = enabled3D;
+	}
+
+	@Override
+	public Vector2f get2DPosition() {
+		return position;
+	}
+
+	@Override
+	public Vector3f get3DPosition() {
+		if (enabled3D)
+			return null;// Sphere projection
+		else
+			return new Vector3f(position.x, position.y, 0.0f);//Make a flat plane
+	}
+
+}

@@ -1,0 +1,54 @@
+package com.troy.hacktj.server;
+
+import java.io.*;
+import java.util.Scanner;
+
+import org.apache.logging.log4j.*;
+
+import com.troy.hacjtj.account.*;
+import com.troy.hacjtj.util.*;
+import com.troy.hacktj.commands.CommandsParser;
+import com.troyberry.util.MiscUtil;
+
+public class Main {
+
+	public static Server serverAccess;
+
+	private static final Logger logger = LogManager.getLogger(Main.class);
+
+	public static void main(String[] args) throws IOException {
+		SerializationManager.init();
+		Server server = null;
+		Scanner scanner = new Scanner(System.in);
+		try {
+			logger.info("Starting Server");
+			System.setSecurityManager(new DiploServerSecutiryManager());
+			server = new Server();
+			/*
+			 * server.registerUser("Troy_Neubauer", "Furminator1".toCharArray(), "troyneubauer@gmail.com"); server.registerUser("Albert_Ding",
+			 * "IAMA'DING_DONG".toCharArray(), "ding@dong.com"); server.registerUser("Justin_Kim", "ILikeCompsci".toCharArray(), "jus@kim.com");
+			 * server.registerUser("Chas_Huang", "PenitrateYannie!".toCharArray(), "chashuang_1@gmail.com"); server.registerUser("Drew_Gautier",
+			 * "Diplo4lyfe!".toCharArray(), "drew@gmail.com");
+			 */
+
+			CommandsParser parser = new CommandsParser(server);
+			while (true) {
+				String line = scanner.nextLine();
+				if (parser.parse(line))
+					break;
+
+			}
+
+		} catch (RuntimeException r) {
+			logger.fatal("Unhandled exception in main");
+			System.err.println(MiscUtil.getStackTrace(r));
+			HackTJUtils.dumpDiploLogPretty();
+			if (server != null)
+				server.forceShutdown(1);
+
+		}
+		if (server != null)
+			server.shutdown();
+		scanner.close();
+	}
+}

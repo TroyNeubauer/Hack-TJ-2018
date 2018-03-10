@@ -1,0 +1,7 @@
+include   ':Hack TJ Base'
+project(':Hack TJ Base').projectDir = new File('C:/Hack TJ/Hack TJ Base')
+
+include   ':Troy Berry Core'
+project(':Troy Berry Core').projectDir = new File('C:/Java/Current Projects/Troy Berry Core')
+
+include 'desktop', 'android', 'ios', 'html', 'core'

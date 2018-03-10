@@ -1,0 +1,51 @@
+package com.troy.hacjtj.game;
+
+public class Account extends DefaultGameObj {
+
+	public String username, email;
+	public Profile profile;
+
+	public Account(long id, String username, String email, Profile profile) {
+		super(id);
+		this.username = username;
+		this.email = email;
+		this.profile = profile;
+		this.profile.setAccount(this);
+	}
+
+	public Account(long id, String username, String email) {
+		super(id);
+		this.username = username;
+		this.email = email;
+		this.profile = new Profile(this);
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public Profile getProfile() {
+		return profile;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Account [username=" + username + ", email=" + email + ", profile=" + profile + "]";
+	}
+
+	
+}

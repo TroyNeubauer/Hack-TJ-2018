@@ -1,0 +1,13 @@
+package com.troy.hacjtj.packet;
+
+public abstract class CreateData<T> {
+    private Class<T> type;
+
+    public CreateData(Class<T> clazz) {
+        this.type = clazz;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
+}

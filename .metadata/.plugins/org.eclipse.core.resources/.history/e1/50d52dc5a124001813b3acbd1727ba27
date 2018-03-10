@@ -1,0 +1,126 @@
+package com.troy.hacktj;
+
+public class PickingFlickScrollPane extends FlickScrollPane {
+
+	   private float pickDifferenceX = -1;
+	   private float pickAmountY;
+	   private float pickAmountX;
+	   private Actor picked;
+	   private boolean waitForStop = false;
+
+	   public PickingFlickScrollPane () {
+	      super(null, null);
+	   }
+
+	   /** @param widget May be null. */
+	   public PickingFlickScrollPane (Actor widget) {
+	      super(widget, null);
+	   }
+
+	   /** @param widget May be null. */
+	   public PickingFlickScrollPane (Actor widget, String name) {
+	      super(widget,name);
+	   }
+
+	   @Override
+	   public void act (float delta) {
+	      super.act(delta);
+
+	      if (flingTimer > 0) {
+	         waitForStop = true;
+	         float alpha = flingTimer / flingTime;
+	         amountX -= velocityX * alpha * delta;
+	         amountY -= velocityY * alpha * delta;
+	         clamp();
+
+	         // Stop fling if hit overscroll distance.
+	         if (amountX == -overscrollDistance) velocityX = 0;
+	         if (amountX >= maxX + overscrollDistance) velocityX = 0;
+	         if (amountY == -overscrollDistance) velocityY = 0;
+	         if (amountY >= maxY + overscrollDistance) velocityY = 0;
+
+	         flingTimer -= delta;
+	      }else{
+	         velocityX = 0;
+	         if(waitForStop){
+	            scrollToPicked();
+	            waitForStop = false;
+	         }
+	      }
+
+	      if (overscroll && !gestureDetector.isPanning()) {
+	         if (amountX < 0) {
+	            amountX += (overscrollSpeedMin + (overscrollSpeedMax - overscrollSpeedMin) * -amountX / overscrollDistance) * delta;
+	            if (amountX > 0) amountX = 0;
+	         } else if (amountX > maxX) {
+	            amountX -= (overscrollSpeedMin + (overscrollSpeedMax - overscrollSpeedMin) * -(maxX - amountX) / overscrollDistance)
+	               * delta;
+	            if (amountX < maxX) amountX = maxX;
+	         }
+	         
+	         if (amountY < 0) {
+	            amountY += (overscrollSpeedMin + (overscrollSpeedMax - overscrollSpeedMin) * -amountY / overscrollDistance) * delta;
+	            if (amountY > 0) amountY = 0;
+	         } else if (amountY > maxY) {
+	            amountY -= (overscrollSpeedMin + (overscrollSpeedMax - overscrollSpeedMin) * -(maxY - amountY) / overscrollDistance)
+	               * delta;
+	            if (amountY < maxY) amountY = maxY;
+	         }
+	         
+	         if(pickDifferenceX != -1){
+	            float diff = (overscrollSpeedMin + (overscrollSpeedMax - overscrollSpeedMin) * 70 / Math.abs(pickDifferenceX)) * delta;
+	            if(pickDifferenceX > 0){
+	               amountX += diff;
+	               pickDifferenceX -= diff;
+	               if(pickDifferenceX < 0 || amountX >= pickAmountX){
+	                  pickDifferenceX = -1;
+	                  amountX = pickAmountX;
+	               }
+	            }else if(pickDifferenceX < 0){
+	               amountX -= diff;
+	               pickDifferenceX += diff;
+	               if(pickDifferenceX > 0 || amountX <= pickAmountX){
+	                  pickDifferenceX = -1;
+	                  amountX = pickAmountX;
+	               }
+	            }
+	         }
+	      }
+	   }
+
+	   @Override
+	   public void touchUp (float x, float y, int pointer) {
+	      super.touchUp(x, y, pointer);
+	      if(velocityX == 0){
+	         Gdx.app.log("touchup", "scrolltopick");
+	         scrollToPicked();
+	      }
+	   }
+
+	   private void scrollToPicked(){
+	      if(widget instanceof Table){
+	         Table myTable = (Table)widget;
+	         LinkedList<Actor> tableActors = (LinkedList<Actor>) myTable.getActors();
+	         int sumOfActors = 0;
+	         int actorId = 0;
+	         Actor currentActor;
+	         for(Actor a : tableActors){
+	            if(amountX > (sumOfActors+a.width*0.5)){
+	               sumOfActors+=a.width;
+	               actorId++;
+	            }else{
+	               break;
+	            }
+	         }
+	         
+	         picked = tableActors.get(actorId);
+	         pickDifferenceX = sumOfActors - amountX;
+	         if(pickDifferenceX == 0)pickDifferenceX=-1;
+	         pickAmountX = sumOfActors;
+	      }
+	   }
+	   
+	   public Actor getPicked(){
+	      return picked;
+	   }
+	}

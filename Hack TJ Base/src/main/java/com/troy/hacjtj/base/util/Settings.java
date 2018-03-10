@@ -1,0 +1,25 @@
+package com.troy.hacjtj.base.util;
+
+import java.util.HashMap;
+
+public class Settings {
+	
+	private HashMap<String, Object> settings = new HashMap<String, Object>();
+
+	public Object getSetting(String name) {
+		return settings.get(name);
+	}
+
+	public <T> T getSetting(Class<T> clazz) {
+		return (T) getSetting(clazz.getName());
+	}
+
+	public void putSetting(String name, Object obj) {
+		settings.put(name, obj);
+	}
+
+	public <T> void putSetting(Class<T> clazz, T obj) {
+		putSetting(clazz.getName(), obj);
+	}
+
+}

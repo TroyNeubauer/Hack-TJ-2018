@@ -1,0 +1,254 @@
+package com.troy.hacktj.server.net;
+
+import java.beans.XMLDecoder;
+import java.io.IOException;
+import java.net.*;
+import java.util.*;
+
+import org.apache.logging.log4j.*;
+
+import com.troy.hacjtj.base.account.*;
+import com.troy.hacjtj.base.net.*;
+import com.troy.hacjtj.base.packet.*;
+import com.troy.hacjtj.base.packet.RegisterReply.RegisterReplyEnum;
+import com.troy.hacjtj.map.Map;
+import com.troy.hacktj.server.Server;
+import com.troy.hacktj.server.database.DatabaseAccount;
+import com.troyberry.util.MiscUtil;
+
+/**
+ * Modification of {@link EchoServer} which utilizes Java object serialization.
+ */
+public final class HackTJServerNet implements Runnable {
+
+	private static final Logger logger = LogManager.getLogger(HackTJServerNet.class);
+	private final List<Client> connectedList = new ArrayList<Client>();
+	private final RecieverManager recieverManager = new RecieverManager(getClass());
+
+	private ServerSocket socket;
+
+	private final Thread thread;
+	private static Server server;// For access in inner classes
+
+	public HackTJServerNet(Server server) {
+		HackTJServerNet.server = server;
+		try {
+			this.socket = new ServerSocket(Constants.PORT);
+			logger.info("Server ready to recieve connections");
+		} catch (IOException e) {
+			e.printStackTrace();
+			server.forceShutdown(1);
+		}
+		this.thread = new Thread(this, "Server main network thread");
+		thread.start();
+	}
+
+	public void run() {
+		while (true) {
+			Socket s = null;
+			try {
+				s = socket.accept();
+				ClientRunnable runnable = new ClientRunnable(s);
+				Thread thread = new Thread(runnable);
+				Client client = new Client(thread, s);
+				runnable.setClient(client);
+				thread.start();
+			} catch (SocketException e) {
+				logger.info("Closing socket");
+				if (s != null && s.isClosed())
+					try {
+						s.close();
+					} catch (IOException e1) {
+					} // Ignore
+				break;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		logger.info("Server net thread ending");
+	}
+
+	private class ClientRunnable implements Runnable {
+		private Socket socket;
+		private Client client;
+
+		public ClientRunnable(Socket socket) {
+			this.socket = socket;
+		}
+
+		public void setClient(Client client) {
+			this.client = client;
+		}
+
+		@Override
+		public void run() {
+			connectedList.add(client);
+			XMLDecoder coder = null;
+			try {
+				coder = new XMLDecoder(socket.getInputStream());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			while (!socket.isClosed()) {
+				try {
+					Object obj = coder.readObject();
+					System.out.println("Read object! " + obj);
+					assert obj instanceof PacketData;
+					recieverManager.onRecieve(client, (PacketData) obj);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			connectedList.remove(client);
+			coder.close();
+			client.disconnect();
+			logger.info("Ending client socket thread");
+		}
+	};
+
+	public void cleanUp() {
+		for (Client client : connectedList)
+			client.disconnect();
+
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public class RequestHandler extends PacketDataReceiver<ObjectRequest> {
+		@Override
+		public void onReceive(Sendable sender, ObjectRequest data) {
+			Class<?> clazz = data.getType();
+			System.out.println("recieved " + data);
+			ObjectResponse response = null;
+			if (TypeLookupFactory.getInstance().hasLookup(clazz) && MyObject.class.isAssignableFrom(clazz)) {
+				Object result = null;
+				try {
+					TypeLookup<?> lookup = TypeLookupFactory.getInstance().getLookup((Class<MyObject>) clazz);
+					result = lookup.lookup(data.getRequestedObjectID());
+				} catch (Exception e) {
+					result = null;
+					System.out.println(MiscUtil.getStackTrace(e));
+				}
+				if (result == null) {
+					System.out.println("Request not found " + data.getRequestedObjectID());
+					response = new ObjectResponse(clazz, null, data.getPacketID(), false, "Unknown ID");
+				} else {
+					System.out.println("Valid request " + result);
+					response = new ObjectResponse(clazz, result, data.getPacketID(), true, "");
+				}
+			} else {
+				response = new ObjectResponse(Void.TYPE, null, data.getPacketID(), false, "Unknown Type");
+				sender.sendResponse(response);
+				logger.warn("Missing lookup for type " + clazz);
+			}
+			sender.sendResponse(response);
+		}
+
+		@Override
+		public Class<ObjectRequest> getType() {
+			return ObjectRequest.class;
+		}
+	}
+
+	public class CreateMapRequestHandler extends PacketDataReceiver<CreateMapRequest> {
+
+		@Override
+		public void onReceive(Sendable sender, CreateMapRequest data) {
+			DatabaseAccount account = TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).lookup(sender.getAccount().getId());
+			ObjectResponse<Map> result;
+
+			// FIXME: Disable this later on
+			if (System.currentTimeMillis() < 1530417600000L) {
+				account.setPremium(true);
+				logger.info("Making account pro: " + account);
+			}
+			if (account.isPremium()) {
+				CreateMapData mapData = data.getData();
+				logger.info("Creating new map " + data.getData() + " by " + account);
+				Map map = new Map(mapData.getName(), sender.getAccount(), mapData.is3D());
+				TypeLookupFactory.getInstance().getLookup(Map.class).add(map);
+				result = new ObjectResponse<Map>(Map.class, map, data.getPacketID(), true, "");
+			} else {
+				logger.info("Haha non preimun noob " + sender + " just  tried to create a map with data " + data.getData());
+				result = new ObjectResponse<Map>(Map.class, null, data.getPacketID(), false, "");
+			}
+			sender.sendResponse(result);
+		}
+
+		@Override
+		public Class<CreateMapRequest> getType() {
+			return CreateMapRequest.class;
+		}
+
+	}
+
+	public class DisconnectHandler extends PacketDataReceiver<Disconnect> {
+
+		@Override
+		public void onReceive(Sendable sender, Disconnect data) {
+			sender.disconnect();
+		}
+
+		@Override
+		public Class<Disconnect> getType() {
+			return Disconnect.class;
+		}
+
+	}
+
+	public class LoginDataHandler extends PacketDataReceiver<LoginData> {
+
+		@Override
+		public void onReceive(Sendable sender, LoginData data) {
+			String username = new String(data.getUsername());
+			DatabaseAccount account;
+			if ((account = server.areCredentialsValid(username, data.getPassword())) != null) {
+				sender.sendResponse(new LoginReply(account.getAccount()));
+				sender.setData(account);
+			} else {
+				sender.sendResponse(new LoginReply());
+			}
+		}
+
+		@Override
+		public Class<LoginData> getType() {
+			return LoginData.class;
+		}
+	}
+
+	public class RegisterDataHandler extends PacketDataReceiver<RegisterData> {
+
+		@Override
+		public Class<RegisterData> getType() {
+			return RegisterData.class;
+		}
+
+		@Override
+		public void onReceive(Sendable sender, RegisterData data) {
+			String username = new String(data.getUsername()), email = new String(data.getEmail());
+			if (server.containsUser(username)) {
+				sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_USERNAME_IN_USE));
+			} else {
+				for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).getAll()) {
+					if (account.getAccount().getEmail().equals(email)) {
+						sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_EMAIL_IN_USE));
+						logger.info("Email in use " + username + ", em " + email);
+						return;
+					}
+				}
+				logger.info("Regitering user " + username + ", em " + email);
+				server.registerUser(username, data.getPassword(), email);
+				sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_SUCEED));
+			}
+		}
+
+	}
+
+	public List<Client> getConnected() {
+		return new ArrayList<Client>(connectedList);
+	}
+
+}

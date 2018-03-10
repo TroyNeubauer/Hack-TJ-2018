@@ -1,0 +1,5 @@
+package com.troy.hacjtj.account;
+
+public interface GameObj {
+	public long getId();
+}

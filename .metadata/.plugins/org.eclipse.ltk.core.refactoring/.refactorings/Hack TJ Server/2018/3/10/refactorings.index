@@ -1,2 +1,18 @@
 1520658903154	Delete element
 1520658915812	Delete element
+1520714340304	Rename package 'com.troy.diplo.commands'
+1520714362336	Rename package 'com.troy.diplo.server'
+1520714369385	Rename package 'com.troy.diplo.server.database'
+1520714376030	Rename package 'com.troy.diplo.server.net'
+1520714382437	Rename package 'com.troy.diplo.server.secutiry'
+1520714388894	Rename package 'com.troy.diplo.server.settings'
+1520714397545	Rename package 'com.troy.hacktjs.commands'
+1520714405139	Delete element
+1520715440455	Rename type 'DiploServer'
+1520715442924	Delete element
+1520717333290	Rename package 'com.troy.hacktj.commands'
+1520717336813	Rename package 'com.troy.hacktj.database'
+1520717340375	Rename package 'com.troy.hacktj.net'
+1520717344388	Rename package 'com.troy.hacktj.secutiry'
+1520717510836	Rename type 'DiploServerNet'
+1520723040204	Rename local variable 'coder'

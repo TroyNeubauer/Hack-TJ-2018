@@ -1,0 +1,24 @@
+package com.troy.diplo.map.province;
+
+import com.troyberry.math.*;
+
+public class Position3D implements Position {
+	
+	private Vector3f position;
+	
+	public Position3D(Vector3f position) {
+		this.position = position;
+	}
+
+	@Override
+	public Vector2f get2DPosition() {
+		return null;//2D mapping
+	}
+
+	@Override
+	public Vector3f get3DPosition() {
+
+		return position;
+	}
+
+}

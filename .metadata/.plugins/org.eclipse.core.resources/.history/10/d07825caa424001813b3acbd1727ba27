@@ -1,0 +1,15 @@
+package com.troy.hacjtj.account;
+
+/**
+ * Represents a player's profile
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class Profile {
+
+
+	public Profile() {
+	}
+
+}

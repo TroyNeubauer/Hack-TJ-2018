@@ -1,0 +1,110 @@
+package com.troy.hacktj.database;
+
+import java.util.Arrays;
+
+import com.troy.diplo.game.*;
+import com.troy.diplo.server.secutiry.Security;
+import com.troy.diplo.server.settings.*;
+
+/**
+ * Represents a user's account
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class DatabaseAccount implements GameObj {
+
+	private Account account;
+
+	/** The number of iterations used to hash their password */
+	private int iterations;
+	/** The user's specific salt */
+	private byte[] salt;
+	/** The hash of the user's password */
+	private byte[] hash;
+
+	private boolean premium = false, adFree = false;
+
+	public DatabaseAccount() {
+	}
+
+	public DatabaseAccount(Account account, int iterations, byte[] salt, byte[] hash) {
+		this.account = account;
+		this.iterations = iterations;
+		this.salt = salt;
+		this.hash = hash;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public int getIterations() {
+		return iterations;
+	}
+
+	public byte[] getSalt() {
+		return salt;
+	}
+
+	public byte[] getHash() {
+		return hash;
+	}
+
+	@Override
+	public String toString() {
+		return "DatabaseAccount [account=" + account + ", iterations=" + iterations + ", salt=" + Arrays.toString(salt) + ", hash=" + Arrays.toString(hash) + "]";
+	}
+
+	public long getId() {
+		return account.getId();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((account == null) ? 0 : account.hashCode());
+		result = prime * result + Arrays.hashCode(hash);
+		result = prime * result + iterations;
+		result = prime * result + Arrays.hashCode(salt);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return account.equals(obj);
+	}
+
+	public void onLogin(CryptoSettings settings, char[] password) {
+		double percentOff = Math.abs(1.0 - (double) settings.getNowIterations() / (double) this.iterations);
+		if (percentOff > DiploConstants.MAX_ITERATION_PERCENT_DIFFERENCE) {
+			redoIterations(settings, password);
+		}
+	}
+
+	private void redoIterations(CryptoSettings settings, char[] password) {
+		int newIterations = settings.getNowIterations();
+		if (this.iterations >= newIterations)
+			return;
+		this.hash = Security.getHashedPassword(password, salt, settings.getPepper(), newIterations, settings.getHashBytes());
+		this.iterations = newIterations;
+	}
+
+	public boolean isPremium() {
+		return premium;
+	}
+
+	public boolean isAdFree() {
+		return adFree;
+	}
+
+	public void setPremium(boolean premium) {
+		this.premium = premium;
+	}
+
+	public void setAdFree(boolean adFree) {
+		this.adFree = adFree;
+	}
+
+}

@@ -1,0 +1,215 @@
+package com.troy.hacktj;
+
+import com.troy.hacktj.base.acc
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
+import com.badlogic.gdx.net.Socket;
+import com.badlogic.gdx.net.SocketHints;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
+import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
+
+public class HackTJNet {
+    private Socket socket;
+    private XMLDecoder in;
+    private XMLEncoder out;
+    private Thread reciever;
+    private final RecieverManager recieverManager = new RecieverManager(getClass());
+    private volatile boolean shouldDisconnect;
+
+    private void connect() {
+        SocketHints hints = new SocketHints();
+        hints.tcpNoDelay = false;
+        hints.performancePrefConnectionTime = 10;
+        try {
+            socket = Gdx.net.newClientSocket(Net.Protocol.TCP, Constants.ADDRESS, DiploConstants.PORT, hints);
+            out = new XMLEncoder(socket.getOutputStream());
+            in = new XMLDecoder(socket.getInputStream());
+        } catch(GdxRuntimeException e) {
+            try {
+                Thread.sleep(500);
+            } catch(InterruptedException e1) {
+
+            }
+            System.out.println("Unable to connect to server: " + e.getMessage());
+        }
+    }
+
+    public com.troy.diplo.map.Map createMap(CreateMapData data) {
+        long packetID = nextPacketID();
+        ServerReceipt<com.troy.diplo.map.Map> rec = new ServerReceipt<com.troy.diplo.map.Map>(data.getType());
+        write(new CreateMapRequest(packetID, data));
+        com.troy.diplo.map.Map map =  waitForRecipt(rec, packetID);
+        if(map == null && !rec.isGood()) DiploClient.showInfoMessage("Upgrade Your Account", "Creating custom maps is a premium feature.");
+        return map;
+    }
+
+    public <T> T getFromServer(Class<T> clazz, long objectID) {
+        long packetID = nextPacketID();
+        ServerReceipt<T> rec = new ServerReceipt<T>(clazz);
+        write(new ObjectRequest<T>(clazz, packetID, objectID));
+        return waitForRecipt(rec, packetID);
+    }
+
+    private <T> T waitForRecipt(ServerReceipt<T> rec, long packetID) {
+        outgoingRequests.put(packetID, rec);
+        synchronized (rec) {
+            try {
+                if(Thread.currentThread() != DiploClient.MAIN_THREAD) {
+                    System.out.println("WARNING!!! receipt is not on the main thread!!! " + Thread.currentThread());
+                    throw new RuntimeException();
+                }
+                rec.wait();
+            } catch(InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(rec.isGood()) {
+            return rec.getObj();
+        }
+        return null;
+    }
+
+    private long nextPacketID() {
+        return requestCounter++;
+    }
+
+
+    public void run() {
+        while(!shouldDisconnect) {
+            connect();
+            if(socket == null) continue;
+            Server server = new Server(socket.getOutputStream());
+            while (socket.isConnected()) {
+                try {
+                    Object obj = in.readObject();
+                    if(PacketData.class.isAssignableFrom(obj.getClass())) {
+                        recieverManager.onRecieve(server, (PacketData) obj);
+                    } else {
+                        System.err.println("Received object is NOT a packet data object! " + obj.getClass());
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }
+    }
+
+    public static class LoginReplyHandler extends PacketDataReceiver<LoginReply> {
+
+        public void onReceive(Sendable sender, LoginReply data) {
+            if(data.isAccept()) {
+                //Show main screen with games
+                DiploClient.getInstance().addMainThreadAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        DiploClient.getInstance().setAccount(data.getAccount());
+                        DiploClient.getInstance().getScreen().dispose();
+                        DiploClient.getInstance().setScreen(new SelectionScreen());
+                        DiploClient.getInstance().getAds().showFullscreenAd();
+                    }
+                });
+            } else {
+                final GDXButtonDialog warningDialog = DiploClient.getInstance().getDialogs().newDialog(GDXButtonDialog.class);
+                warningDialog.setTitle("Invalid credentals!").setMessage(data.toString());
+                warningDialog.addButton("Ok");
+                warningDialog.addButton("Reset Password");
+                warningDialog.setClickListener(new ButtonClickListener() {
+                    @Override
+                    public void click(int button) {
+                        warningDialog.dismiss();
+                        if(button == 1) {//They clicked reset password
+                            //Show reset password screen
+                        }
+                    }
+                });
+                warningDialog.build().show();
+            }
+        }
+
+        @Override
+        public Class<LoginReply> getType() {
+            return LoginReply.class;
+        }
+    }
+
+    public static class ObjectResponceHandler extends PacketDataReceiver<ObjectResponse> {
+        @Override
+        public void onReceive(Sendable sender, ObjectResponse data) {
+            if(outgoingRequests.containsKey(data.getPacketID())) {
+                ServerReceipt req = outgoingRequests.remove(data.getPacketID());
+                if(data.getType() != req.getType() && data.getType() != Void.TYPE) {
+                    throw new RuntimeException("Types dont match!!!! in queue: " + req.getType() + " recieved from server " + data.getType());
+                }
+                if(data.isGood()) {
+                    req.setObj(data.getObject());
+                } else {
+                    req.setObj(null);
+                }
+
+                req.setGood(data.isGood());
+                req.setInfo(data.getInfo());
+                synchronized (req) {
+                    req.notify();//Notify the thread waiting for this responce
+                }
+
+            }
+            //Add object to registry
+        }
+
+        @Override
+        public Class<ObjectResponse> getType() {
+            return ObjectResponse.class;
+        }
+    }
+
+    public static class RegisterReplyHandler extends PacketDataReceiver<RegisterReply> {
+        public void onReceive(Sendable sender, RegisterReply data) {
+            DiploClient.showInfoMessage(data.isSucceed() ? "Account Created" : "Account Creation Failed", "");
+        }
+
+        @Override
+        public Class<RegisterReply> getType() {
+            return RegisterReply.class;
+        }
+    }
+
+    public DiploClientNet() {
+
+        reciever = new Thread(this);
+        reciever.start();
+    }
+
+    public void write(Object obj) {
+        try {
+            if(out != null) {
+                out.writeObject(obj);
+                out.flush();
+            }
+        } catch(Exception e) {
+            socket.dispose();
+        }
+    }
+
+    public Object read() {
+        return in.readObject();
+    }
+
+    public void close() {
+        shouldDisconnect = true;
+        write(new Disconnect());
+        if(socket != null) socket.dispose();
+    }
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected();
+    }
+}

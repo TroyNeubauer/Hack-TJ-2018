@@ -1,0 +1,82 @@
+package com.troy.diplo.map.province;
+
+import java.util.List;
+
+import com.troy.diplo.game.DiploConstants;
+import com.troy.diplo.util.DiploColor;
+
+/**
+ * Represents a province on a map. Exists on a per map basis. A province is never changed for a game, and never holds game specific data. 
+ * Used like a template for creating games
+ *
+ */
+public class Province {
+	
+	private String name;
+	private boolean supplyCenter;
+	private ProvinceType type;
+	private List<Position> positions;
+	private Position center;
+	private int startingID = -1;//-1 if this isan't a starting point, otherwise this id represents the team that will start here
+	
+	public DiploColor getColor() {
+		return DiploConstants.DEFAULT_PROVINCE_COLOR;
+	}
+
+	public Province(String name, boolean supplyCenter, ProvinceType type, List<Position> positions, Position center, int startingID) {
+		this.name = name;
+		this.supplyCenter = supplyCenter;
+		this.type = type;
+		this.positions = positions;
+		this.center = center;
+		this.startingID = startingID;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isSupplyCenter() {
+		return supplyCenter;
+	}
+
+	public void setSupplyCenter(boolean supplyCenter) {
+		this.supplyCenter = supplyCenter;
+	}
+
+	public ProvinceType getType() {
+		return type;
+	}
+
+	public void setType(ProvinceType type) {
+		this.type = type;
+	}
+
+	public Position getCenter() {
+		return center;
+	}
+
+	public void setCenter(Position center) {
+		this.center = center;
+	}
+
+	public int getStartingID() {
+		return startingID;
+	}
+
+	public void setStartingID(int startingID) {
+		this.startingID = startingID;
+	}
+
+	public List<Position> getPositions() {
+		return positions;
+	}
+	
+	
+	
+	
+}

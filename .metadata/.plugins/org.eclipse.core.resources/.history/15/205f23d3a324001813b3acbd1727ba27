@@ -1,0 +1,90 @@
+package com.troy.diplo.game;
+
+import java.util.*;
+
+import com.troy.diplo.map.Game;
+import com.troy.diplo.map.Map;
+import com.troy.diplo.util.SpecialRefrence;
+
+/**
+ * Represents a player's profile
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class Profile {
+
+	private SpecialRefrence<Account> account;
+
+	private List<SpecialRefrence<Game>> games = new ArrayList<SpecialRefrence<Game>>();
+	private List<SpecialRefrence<Map>> maps = new ArrayList<SpecialRefrence<Map>>();
+
+	private float highestPlacePercentile;
+
+	public Profile() {
+	}
+
+	public Profile(Account account) {
+		this.account = new SpecialRefrence<Account>(account);
+	}
+
+	public Account getAccount() {
+		return account.getObj();
+	}
+
+	public List<SpecialRefrence<Game>> getGameRaw() {
+	    return games;
+    }
+
+	public List<Game> getGames() {
+		List<Game> result = new ArrayList<Game>();
+		for (SpecialRefrence<Game> game : games) {
+			result.add(game.getObj());
+		}
+		return result;
+	}
+
+	public List<Map> getMaps() {
+		List<Map> result = new ArrayList<Map>();
+		for (SpecialRefrence<Map> map : maps) {
+			result.add(map.getObj());
+		}
+		return result;
+	}
+
+	public float getHighestPlacePercentile() {
+		return highestPlacePercentile;
+	}
+
+	public void setHighestPlacePercentile(float highestPlacePercentile) {
+		this.highestPlacePercentile = highestPlacePercentile;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((games == null) ? 0 : games.hashCode());
+		result = prime * result + Float.floatToIntBits(highestPlacePercentile);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		return ((Profile) obj).account.equals(this.account);
+	}
+
+	@Override
+	public String toString() {
+		return "Profile [account username=" + account.getObj().username + ", games=" + games + ", highestPlacePercentile=" + highestPlacePercentile + "]";
+	}
+
+	public void setAccount(Account account) {
+		this.account.setObj(account);
+	}
+
+}

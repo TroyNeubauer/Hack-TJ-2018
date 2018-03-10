@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":Hack TJ Base" external.linked.project.path="$MODULE_DIR$/../../../../Hack TJ Base" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="Hack TJ Server" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android-gradle" name="Android-Gradle">
+      <configuration>
+        <option name="GRADLE_PROJECT_PATH" value=":Hack TJ Base" />
+      </configuration>
+    </facet>
+    <facet type="java-gradle" name="Java-Gradle">
+      <configuration>
+        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/../../../../Hack TJ Base/build" />
+        <option name="BUILDABLE" value="true" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/../../../../Hack TJ Base/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/../../../../Hack TJ Base/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../Hack TJ Base">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../Hack TJ Base/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Troy Berry Core" scope="PROVIDED" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.ow2.asm:asm:5.0.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:2.5.1" level="project" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.esotericsoftware:minlog:1.3.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.esotericsoftware:reflectasm:1.11.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.esotericsoftware:kryo:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.hashids:hashids:1.0.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.9.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm:5.0.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.objenesis:objenesis:2.5.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.esotericsoftware:minlog:1.3.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.esotericsoftware:reflectasm:1.11.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.esotericsoftware:kryo:4.0.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.hashids:hashids:1.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.9.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.ow2.asm:asm:5.0.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.objenesis:objenesis:2.5.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.esotericsoftware:minlog:1.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.esotericsoftware:reflectasm:1.11.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.esotericsoftware:kryo:4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.hashids:hashids:1.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.9.4" level="project" />
+    <orderEntry type="module" module-name="Troy Berry Core" scope="TEST" />
+    <orderEntry type="module" module-name="Troy Berry Core" scope="RUNTIME" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="fast-classpath-scanner-2.9.4" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="hashids-1.0.3" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="kryo-4.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="reflectasm-1.11.3" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="minlog-1.3.0" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="objenesis-2.5.1" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="asm-5.0.4" level="project" />
+  </component>
+</module>

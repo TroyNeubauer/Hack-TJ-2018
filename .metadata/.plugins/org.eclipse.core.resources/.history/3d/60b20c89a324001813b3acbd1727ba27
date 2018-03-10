@@ -1,0 +1,13 @@
+apply plugin: 'java'
+repositories {
+
+}
+
+dependencies {
+	compile group: 'org.codehaus.mojo', name: 'jaxb2-maven-plugin', version: '2.3.1'
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.9.4'
+    compile 'org.hashids:hashids:1.0.3'
+}
+

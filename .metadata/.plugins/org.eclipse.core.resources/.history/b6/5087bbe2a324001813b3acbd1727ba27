@@ -1,0 +1,5 @@
+package com.troy.diplo.packet;
+
+public abstract class PacketData {
+	
+}

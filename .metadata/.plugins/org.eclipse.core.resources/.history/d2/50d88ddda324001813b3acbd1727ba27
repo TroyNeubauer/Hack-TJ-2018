@@ -1,0 +1,84 @@
+package com.troy.diplo.util;
+
+import java.util.*;
+
+import com.troy.hacjtj.account.*;
+
+public class SpecialRefrence<T extends DefaultGameObj> {
+	private transient T obj;
+	private long id = -1;
+	private Class<T> clazz;
+
+	public SpecialRefrence(T obj) {
+		this.clazz = (Class<T>) obj.getClass();
+		this.obj = obj;
+		this.id = obj.getId();
+	}
+
+	public SpecialRefrence(Class<T> clazz) {
+		this.clazz = clazz;
+	}
+
+	public SpecialRefrence(long id, Class<T> clazz) {
+		this.id = id;
+		this.clazz = clazz;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public T getObj() {
+		if (obj == null && id != -1)
+			this.obj = TypeLookupFactory.getInstance().getLookup(clazz).lookup(id);
+		return obj;
+	}
+
+	public void setObj(T obj) {
+		if (obj == null) {
+			this.id = -1;
+		} else {
+			this.id = obj.getId();
+		}
+		this.obj = obj;
+
+	}
+
+	public boolean isNull() {
+		return id == -1 || obj == null;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this.obj == null)
+			return false;
+		return this.obj.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return obj.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "[Special refrence]: " + obj.toString();
+	}
+
+	public static <E extends DefaultGameObj> List<SpecialRefrence<E>> toSpecialRefrences(List<E> list) {
+		List<SpecialRefrence<E>> result = new ArrayList<SpecialRefrence<E>>(list.size());
+		for (E obj : list) {
+			result.add(new SpecialRefrence<E>(obj));
+		}
+		return result;
+	}
+
+	public static <E extends DefaultGameObj> List<E> toNormalRefrences(List<SpecialRefrence<E>> list) {
+		List<E> result = new ArrayList<E>(list.size());
+		for (SpecialRefrence<E> obj : list) {
+			result.add(obj.getObj());
+		}
+		return result;
+	}
+
+}

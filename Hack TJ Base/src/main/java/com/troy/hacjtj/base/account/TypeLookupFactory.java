@@ -1,0 +1,20 @@
+package com.troy.hacjtj.base.account;
+
+public abstract class TypeLookupFactory {
+	
+	private static TypeLookupFactory instance = null;
+	
+	public static TypeLookupFactory getInstance() {
+		if(instance == null) throw new IllegalStateException("An instance must be set using TypeLookupFactory.setInstance(Instance)");
+		return instance;
+	}
+	
+	public abstract <T extends MyObject> TypeLookup<T> getLookup(Class<T> clazz);
+	
+	public abstract boolean hasLookup(Class<?> clazz);
+
+	public static void setInstance(TypeLookupFactory instance) {
+		TypeLookupFactory.instance = instance;
+	}
+
+}

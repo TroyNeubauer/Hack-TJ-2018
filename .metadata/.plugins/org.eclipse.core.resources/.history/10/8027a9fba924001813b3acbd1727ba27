@@ -1,0 +1,17 @@
+package com.troy.hacjtj.packet;
+
+import com.troy.hacjtj.net.Request;
+
+public abstract class CreateRequest<T, E> extends Request<T> {
+
+    private E data;
+
+    public CreateRequest(Class<T> type, long packetID, E data) {
+        super(type, packetID);
+        this.data = data;
+    }
+
+	public E getData() {
+        return data;
+    }
+}

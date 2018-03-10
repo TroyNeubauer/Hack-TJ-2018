@@ -1,0 +1,5 @@
+package com.troy.hacjtj.packet;
+
+public abstract class PacketData {
+	
+}

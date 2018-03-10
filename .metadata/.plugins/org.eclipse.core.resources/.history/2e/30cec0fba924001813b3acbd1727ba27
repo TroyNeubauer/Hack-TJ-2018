@@ -1,0 +1,10 @@
+package com.troy.hacjtj.net;
+
+import com.troy.hacjtj.packet.*;
+
+public abstract class PacketDataReceiver<T extends PacketData> {
+
+	public abstract void onReceive(Sendable<T> sender, T data);
+
+    public abstract Class<T> getType();
+}

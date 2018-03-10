@@ -1,0 +1,21 @@
+package com.troy.diplo.map.province;
+
+import com.troyberry.math.*;
+
+/**
+ * Represents a 2 or 3D position that can be converted between 2 and 3D
+ * @author Troy Neubauer
+ *
+ */
+public interface Position {
+	
+	/**
+	 * Gets where this position would be in 2D space
+	 */
+	public Vector2f get2DPosition();
+	
+	/**
+	 * Returns where this position would be in 3D space
+	 */
+	public Vector3f get3DPosition();
+}

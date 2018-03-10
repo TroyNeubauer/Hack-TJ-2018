@@ -1,0 +1,18 @@
+package com.troy.diplo.game;
+
+import java.util.List;
+
+public interface TypeLookup<T> {
+	
+	public T lookup(long id);
+	
+	public long nextUniqueID();
+	
+	public void add(T t);
+	
+	public List<T> getAll();
+	
+	public boolean shouldSave();
+
+	public boolean remove(long id);
+}

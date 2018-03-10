@@ -1,0 +1,11 @@
+package com.troy.hacktj.commands;
+
+public interface ServerTask {
+	
+	
+	public long getTime();
+	
+	public void doTask();
+	
+	public void setManager(BackgroundTaskManager manager);
+}

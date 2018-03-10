@@ -3,7 +3,7 @@ plugins {
   	id 'io.spring.dependency-management' version '1.0.1.RELEASE'
 }
 
-project.ext.mainClassName = "com.troy.hacktj.Main"
+project.ext.mainClassName = "com.troy.hacktj.server.Main"
 project.ext.assetsDir = new File("./");
 
 repositories {
@@ -29,7 +29,7 @@ dependencies {
 
 task fatJar(type: Jar) {
 	manifest {
-    	attributes 'Main-Class': 'com.troy.hacktj.Main'
+    	attributes 'Main-Class': 'com.troy.hacktj.server.Main'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }

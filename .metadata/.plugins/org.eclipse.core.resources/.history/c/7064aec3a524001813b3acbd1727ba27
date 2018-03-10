@@ -1,0 +1,11 @@
+package com.troy.hacjtj.account;
+
+public class MyObjectImpl implements MyObject {
+
+	@Override
+	public long getId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

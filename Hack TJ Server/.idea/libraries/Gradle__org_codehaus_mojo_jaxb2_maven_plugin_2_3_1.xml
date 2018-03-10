@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.codehaus.mojo:jaxb2-maven-plugin:2.3.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/jaxb2-maven-plugin/2.3.1/fc0f632fb6a91d6258b8163ba3f9692be4488b0f/jaxb2-maven-plugin-2.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/jaxb2-maven-plugin/2.3.1/cdf3e17532b697cf5e42e72e7e49a57fe72555b8/jaxb2-maven-plugin-2.3.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

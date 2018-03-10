@@ -1,0 +1,11 @@
+package com.troy.diplo.server.settings;
+
+import com.troy.diplo.util.Settings;
+
+public class ServerSettings extends Settings {
+	
+	public ServerSettings() {
+		putSetting(CryptoSettings.class, CryptoSettings.defaults());
+	}
+
+}

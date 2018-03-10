@@ -1,0 +1,31 @@
+package com.troy.hacjtj.packet;
+
+import com.troy.hacjtj.base.account.*;
+
+public class LoginReply extends PacketData {
+	private Account account;
+
+	public LoginReply(Account account) {
+		this.account = account;
+	}
+	
+	/**
+	 * Indicates that the login failed
+	 */
+	public LoginReply() {
+		this.account = null;
+	}
+
+	public boolean isAccept() {
+		return account != null;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	@Override
+	public String toString() {
+		return "LoginReply [accept=" + (account != null) + ", profile=" + account + "]";
+	}
+}

@@ -1,0 +1,72 @@
+package com.troy.diplo.game;
+
+import com.troy.diplo.util.DiploColor;
+
+public class DiploConstants {
+
+	public static final String ADDRESS = getServerAddress();
+	private static final String DEFAULT_SERVER_ADDRESS = "100.36.44.28";
+	public static final int PORT = 8344;
+
+	public static final String CLIENT_NAME = "Diplo Game";
+
+	public static final int DEFAULT_WIDTH = 1280;
+	public static final int DEFAULT_HEIGHT = 720;
+
+	public static final String USE_LOCALHOST = "DiploUseLocalHost";
+	public static final String OVERRIDE_SERVER_ADDRESS = "DiploOverrideServerAddress";
+	public static final String LOCALHOST_ADDRESS = "localhost";
+
+	public static final boolean IS_SERVER = isServer();
+	public static final boolean IS_DESKTOP = isDesktop();
+
+	public static final String DEFAULT_EXTENSION = "diplo";
+
+	/**
+	 * The maxiumn percent that the ratio of required iterations to current hashes can be for a password before it is rehashed
+	 */
+	public static final double MAX_ITERATION_PERCENT_DIFFERENCE = 0.05;
+
+	public static final DiploColor DEFAULT_PROVINCE_COLOR = new DiploColor(0xFFFFFF);
+
+	private static boolean isServer() {
+		return classExists("com.troy.diplo.server.DiploServer");
+	}
+
+	private static boolean isDesktop() {
+		return classExists("com.troy.diplo.server.DiploServer") || classExists("com.troy.diploclient.desktop.DesktopLauncher");
+	}
+
+	private static boolean classExists(String name) {
+		try {
+			Class<?> server = Class.forName(name);
+			if (server == null)
+				throw new Exception();// Trigger catch to return false
+		} catch (Throwable e) {
+			return false;
+		}
+		return true;
+	}
+
+	private DiploConstants() {
+
+	}
+
+	/**
+	 * Retrieves the InetAddress of the server respecting command line arguments specified, or by default, returns "diplogame.com"
+	 * 
+	 * @return The InetAddress of the server
+	 */
+	private static String getServerAddress() {
+		String address;
+		if (System.getProperty(OVERRIDE_SERVER_ADDRESS) != null) // They specified to use the address provided in the runtime args
+			address = System.getProperty(OVERRIDE_SERVER_ADDRESS);
+		else if (System.getProperty(USE_LOCALHOST) != null) // They specified to use localhost
+			address = LOCALHOST_ADDRESS;
+		else
+			address = DEFAULT_SERVER_ADDRESS;// They didn't specify anything special, so just use the default address
+		return address;
+
+	}
+
+}

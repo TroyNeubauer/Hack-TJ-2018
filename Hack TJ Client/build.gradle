@@ -11,8 +11,6 @@ buildscript {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.3'
-        
-
     }
 }
 
@@ -120,7 +118,7 @@ project(":core") {
         compile "de.tomgrill.gdxfacebook:gdx-facebook-core:1.4.1"
         compile "com.github.czyzby:gdx-lml:1.9.1.9.6"
         compile "de.tomgrill.gdxdialogs:gdx-dialogs-core:1.2.5"
-        
+        compile project(":Hack TJ Base")
     }
 }
 

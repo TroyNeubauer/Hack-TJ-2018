@@ -1,0 +1,75 @@
+package com.troy.diplo.map;
+
+import java.util.*;
+
+import com.troy.diplo.map.province.Province;
+import com.troy.hacjtj.account.*;
+import com.troy.hacjtj.util.SpecialRefrence;
+
+/**
+ * A Map represents a unique template for a game that can be edited
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class Map extends DefaultGameObj {
+
+	private String name;
+	private Account owner;// the owner of the map (has edit privileges. Think google docs)
+	private List<Province> provinces = new ArrayList<Province>();
+	private List<Account> canAccess = new ArrayList<Account>();
+	private boolean enabled3D;
+	private boolean isPublic = true;// Weather or not random people can create games with the map
+
+	public Map(String name, Account owner, boolean enabled3d) {
+		this.name = name;
+		this.owner = owner;
+		enabled3D = enabled3d;
+	}
+
+	/**
+	 * Creates a new Diplo game using this map and registers it
+	 * 
+	 * @param players
+	 *            A mapping of the players who are to participate in this game to their team id's (used for figuring out who starts where)
+	 * @param admins
+	 *            A list of admins who can change the game settings
+	 * @param name
+	 *            The name of the new game
+	 * @return A new game ready for play!
+	 */
+	public Game createGame(List<TeamGame> teams, List<Account> admins, String name) {
+		Game game = new Game(new SpecialRefrence<Map>(this), teams, admins, name);
+		TypeLookupFactory.getInstance().getLookup(Game.class).add(game);
+		return game;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public List<Province> getProvinces() {
+		return provinces;
+	}
+
+	public Account getOwner() {
+		return owner;
+	}
+
+	public boolean is3DEnabled() {
+		return enabled3D;
+	}
+
+	public void shareWith(Account account) {
+		canAccess.remove(account);
+	}
+
+	public void unShare(Account account) {
+		canAccess.remove(account);
+	}
+
+	public void setOwner(Account newOwner) {
+		this.owner = newOwner;
+	}
+
+}

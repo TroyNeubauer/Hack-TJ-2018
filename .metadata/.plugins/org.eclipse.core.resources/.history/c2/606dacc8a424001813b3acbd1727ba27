@@ -1,0 +1,23 @@
+package com.troy.hacjtj.account;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.troy.hacjtj.map.Game;
+import com.troy.hacjtj.util.SpecialRefrence;
+
+/**
+ * Represents a player's profile
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class Profile {
+
+	private float highestPlacePercentile;
+
+	public Profile() {
+	}
+
+}

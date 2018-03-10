@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/519223054/Hack TJ Base.iml" filepath="$PROJECT_DIR$/.idea/modules/519223054/Hack TJ Base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Hack TJ Server.iml" filepath="$PROJECT_DIR$/Hack TJ Server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-198034360/Troy Berry Core.iml" filepath="$PROJECT_DIR$/.idea/modules/-198034360/Troy Berry Core.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,34 @@
+package com.troy.hacjtj.map;
+
+import com.troy.hacjtj.account.DefaultGameObj;
+
+/**
+ * Represents an instance of a team on a per game basis. TeamGame exists to represent starting locations for teams in a game
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class TeamGame extends DefaultGameObj {
+	private int startingPlaceID;
+	private Team owner;
+	private String name;
+
+	public TeamGame(int startingPlaceID, Team owner, String name) {
+		this.startingPlaceID = startingPlaceID;
+		this.owner = owner;
+		this.name = name;
+	}
+
+	public Team getOwner() {
+		return owner;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public int getStartingPlaceID() {
+		return startingPlaceID;
+	}
+
+}

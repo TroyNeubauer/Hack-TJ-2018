@@ -1,0 +1,27 @@
+package com.troy.hacjtj.packet;
+
+import com.troy.diplo.net.Response;
+
+public class ObjectResponse<T> extends Response<T> {
+    private T object;
+
+    public ObjectResponse(Class<T> type, T object, long packetID, boolean good, String info) {
+        super(type, packetID, good, info);
+        this.object = object;
+    }
+
+    public T getObject() {
+        return object;
+    }
+
+    @Override
+    public String toString() {
+        return "ObjectResponse{" +
+                "type=" + getType() +
+                ", object=" + object +
+                ", packetID=" + getPacketID() +
+                ", good=" + isGood() +
+                ", info='" + getInfo() + '\'' +
+                '}';
+    }
+}

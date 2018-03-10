@@ -1,9 +1,12 @@
 apply plugin: 'java'
 repositories {
-
+    jcenter()
 }
 
 dependencies {
-
+    compile project(':Troy Berry Core')
+	compile group: 'io.github.lukehutch', name: 'fast-classpath-scanner', version: '2.9.4'
+    compile 'org.hashids:hashids:1.0.3'
+	compile group: 'com.esotericsoftware', name: 'kryo', version: '4.0.1'
 }
 
