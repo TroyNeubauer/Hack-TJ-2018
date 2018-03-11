@@ -6,7 +6,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.troy.hacjtj.base.account.*;
+import com.troy.hacjtj.base.util.HackTJUtils;
 import com.troy.hacktj.server.database.DatabaseAccount;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
@@ -34,7 +36,7 @@ public class ServerTypeLookupManager extends TypeLookupFactory {
 					File dataFile = new File(dataFileString);
 					if (dataFile.exists()) {
 						Input input = new Input(new FileInputStream(dataFile));
-						entries.put(clazz, (TypeLookup<?>) input.readObject());
+						entries.put(clazz, (TypeLookup<?>) HackTJUtils.getKryo().readClassAndObject(input));
 						input.close();
 					}
 				}
@@ -54,7 +56,6 @@ public class ServerTypeLookupManager extends TypeLookupFactory {
 
 				if (Modifier.isAbstract(clazz.getModifiers()))
 					continue;
-
 				if (clazz.equals(Account.class))
 					continue;
 				assert MyObject.class.isAssignableFrom(clazz);
@@ -94,12 +95,12 @@ public class ServerTypeLookupManager extends TypeLookupFactory {
 			for (Entry<Class<? extends MyObject>, TypeLookup<?>> entry : entries.entrySet()) {
 				if (entry.getValue().shouldSave()) {
 					File individualFile = new File(entry.getKey().getSimpleName() + "." + Constants.DEFAULT_EXTENSION);
-					XMLEncoder coder = new XMLEncoder(new FileOutputStream(individualFile));
+					Output coder = new Output(new FileOutputStream(individualFile));
 					writer.write(entry.getKey().getName());
 					writer.write('\n');
 					writer.write(individualFile.getAbsolutePath());
 					writer.write('\n');
-					coder.writeObject(entry.getValue());
+					HackTJUtils.getKryo().writeClassAndObject(coder, entry.getValue());
 				}
 			}
 		} catch (Exception e) {

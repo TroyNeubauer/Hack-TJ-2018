@@ -82,5 +82,9 @@ public class HackTJUtils {
 					"Invalid ID " + id + " decodes to weird array! " + Arrays.toString(array));
 		return array[0];
 	}
+	
+	public static Kryo getKryo() {
+		return kryos.get();
+	}
 
 }

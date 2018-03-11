@@ -71,7 +71,6 @@ public class Server {
 				return true;
 			}
 		}
-
 		return false;
 	}
 

@@ -1,0 +1,6 @@
+package com.troy.hacjtj.base.account;
+
+public class School extends MyObjectImpl {
+	private String name;
+
+}

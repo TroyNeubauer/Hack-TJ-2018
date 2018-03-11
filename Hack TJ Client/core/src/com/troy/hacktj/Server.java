@@ -21,7 +21,7 @@ public class Server implements Sendable {
 
     @Override
     public void disconnect() {
-
+        out.close();
     }
 
     @Override

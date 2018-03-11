@@ -1,6 +1,5 @@
 package com.troy.hacktj.server.net;
 
-import java.beans.XMLDecoder;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,6 +10,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.esotericsoftware.kryo.io.Input;
 import com.troy.hacjtj.base.account.Constants;
 import com.troy.hacjtj.base.account.TypeLookupFactory;
 import com.troy.hacjtj.base.net.PacketDataReceiver;
@@ -23,6 +23,7 @@ import com.troy.hacjtj.base.packet.PacketData;
 import com.troy.hacjtj.base.packet.RegisterData;
 import com.troy.hacjtj.base.packet.RegisterReply;
 import com.troy.hacjtj.base.packet.RegisterReply.RegisterReplyEnum;
+import com.troy.hacjtj.base.util.HackTJUtils;
 import com.troy.hacktj.server.Server;
 import com.troy.hacktj.server.database.DatabaseAccount;
 
@@ -36,6 +37,7 @@ public final class HackTJServerNet implements Runnable {
 	private final RecieverManager recieverManager = new RecieverManager(getClass());
 
 	private ServerSocket socket;
+	private volatile boolean running = true;
 
 	private final Thread thread;
 	private static Server server;// For access in inner classes
@@ -54,7 +56,7 @@ public final class HackTJServerNet implements Runnable {
 	}
 
 	public void run() {
-		while (true) {
+		while (running) {
 			Socket s = null;
 			try {
 				s = socket.accept();
@@ -64,12 +66,7 @@ public final class HackTJServerNet implements Runnable {
 				runnable.setClient(client);
 				thread.start();
 			} catch (SocketException e) {
-				logger.info("Closing socket");
-					try {
-						s.close();
-					} catch (IOException e1) {
-					} // Ignore
-				break;
+				continue;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -92,15 +89,15 @@ public final class HackTJServerNet implements Runnable {
 		@Override
 		public void run() {
 			connectedList.add(client);
-			XMLDecoder coder = null;
+			Input in = null;
 			try {
-				coder = new XMLDecoder(socket.getInputStream());
+				in = new Input(socket.getInputStream());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			while (!socket.isClosed()) {
 				try {
-					Object obj = coder.readObject();
+					Object obj = HackTJUtils.getKryo().readClassAndObject(in);
 					System.out.println("Read object! " + obj);
 					assert obj instanceof PacketData;
 					recieverManager.onRecieve(client, (PacketData) obj);
@@ -109,7 +106,7 @@ public final class HackTJServerNet implements Runnable {
 				}
 			}
 			connectedList.remove(client);
-			coder.close();
+			in.close();
 			client.disconnect();
 			logger.info("Ending client socket thread");
 		}
@@ -173,7 +170,8 @@ public final class HackTJServerNet implements Runnable {
 			if (server.containsUser(username)) {
 				sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_USERNAME_IN_USE));
 			} else {
-				for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).getAll()) {
+				for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class)
+						.getAll()) {
 					if (account.getAccount().getEmail().equals(email)) {
 						sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_EMAIL_IN_USE));
 						logger.info("Email in use " + username + ", em " + email);
@@ -186,6 +184,10 @@ public final class HackTJServerNet implements Runnable {
 			}
 		}
 
+	}
+	
+	public void shutdown() {
+		running = false;
 	}
 
 	public List<Client> getConnected() {

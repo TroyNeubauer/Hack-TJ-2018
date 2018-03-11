@@ -31,7 +31,6 @@ public class LoginScreen extends MyScreen {
         this.label = new Label("Homework Helper", Settings.skin);
         label.setAlignment(Align.center);
 
-        container.setSkin(Settings.skin);
         container.center();
         container.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         container.add(label).row();

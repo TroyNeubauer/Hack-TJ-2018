@@ -23,22 +23,24 @@ public class HackTJ extends Game {
 	private HackTJNet net;
 	private static HackTJ instance;
     private List<Runnable> actions = new ArrayList<Runnable>();
-    private Account account = null;
+    private Account account = new Account(0, "Test-Username", "testemail@gmail.com");
     private ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
             return new Kryo();
         }
     };
+    private SchoolSelectBox box;
 	
 	@Override
 	public void create () {
         Settings.init();
+        box = new SchoolSelectBox();
         dialogs = GDXDialogsSystem.install();
 	    instance = this;
-        setScreen(new LoginScreen());
+        //setScreen(new LoginScreen());
+        setScreen(new SwipeScreens(1, new AccountSettingsScreen(), new CenterScreen(), new RecentUploadsScreen()));
         this.net = new HackTJNet();
-
 	}
 
     @Override
@@ -49,7 +51,7 @@ public class HackTJ extends Game {
             }
             actions.clear();
         }
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(1, 0, 1, 1);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 	    super.render();
@@ -90,7 +92,15 @@ public class HackTJ extends Game {
         return kryo.get();
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
     public static HackTJ getInstance() {
         return instance;
+    }
+
+    public SchoolSelectBox getSchoolSelectBox() {
+        return box;
     }
 }
