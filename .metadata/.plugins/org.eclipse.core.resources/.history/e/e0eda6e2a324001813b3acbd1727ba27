@@ -1,5 +1,0 @@
-package com.troy.diplo.packet;
-
-public class Disconnect extends PacketData {
-	
-}

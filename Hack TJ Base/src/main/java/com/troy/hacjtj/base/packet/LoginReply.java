@@ -1,6 +1,6 @@
 package com.troy.hacjtj.base.packet;
 
-import com.troy.hacjtj.base.account.*;
+import com.troy.hacjtj.base.Account;
 
 public class LoginReply extends PacketData {
 	private Account account;

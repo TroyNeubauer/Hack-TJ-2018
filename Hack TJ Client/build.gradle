@@ -1,5 +1,5 @@
 buildscript {
-    
+
 
     repositories {
         mavenLocal()
@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.1'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.3'
     }
 }
@@ -46,7 +46,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "de.tomgrill.gdxfacebook:gdx-facebook-desktop:1.4.1"
         compile "de.tomgrill.gdxdialogs:gdx-dialogs-desktop:1.2.5"
-        
+
     }
 }
 
@@ -65,7 +65,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "de.tomgrill.gdxfacebook:gdx-facebook-android:1.4.1"
         compile "de.tomgrill.gdxdialogs:gdx-dialogs-android:1.2.5"
-        
+
     }
 }
 
@@ -82,29 +82,7 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
         compile "de.tomgrill.gdxfacebook:gdx-facebook-ios:1.4.1"
         compile "de.tomgrill.gdxdialogs:gdx-dialogs-ios:1.2.5"
-        
-    }
-}
 
-project(":html") {
-    apply plugin: "gwt"
-    apply plugin: "war"
-
-
-    dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "com.github.czyzby:gdx-kiwi:1.9.1.9.6:sources"
-        compile "de.tomgrill.gdxfacebook:gdx-facebook-core:1.4.1:sources"
-        compile "de.tomgrill.gdxfacebook:gdx-facebook-html:1.4.1:sources"
-        compile "com.github.czyzby:gdx-kiwi:1.9.1.9.6:sources"
-        compile "com.github.czyzby:gdx-lml:1.9.1.9.6:sources"
-        compile "de.tomgrill.gdxdialogs:gdx-dialogs-html:1.2.5"
-        compile "de.tomgrill.gdxdialogs:gdx-dialogs-html:1.2.5:sources"
-        compile "de.tomgrill.gdxdialogs:gdx-dialogs-core:1.2.5:sources"
-        
     }
 }
 

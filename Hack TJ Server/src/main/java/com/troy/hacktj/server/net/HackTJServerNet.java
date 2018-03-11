@@ -11,8 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.esotericsoftware.kryo.io.Input;
-import com.troy.hacjtj.base.account.Constants;
-import com.troy.hacjtj.base.account.TypeLookupFactory;
+import com.troy.hacjtj.base.Constants;
 import com.troy.hacjtj.base.net.PacketDataReceiver;
 import com.troy.hacjtj.base.net.RecieverManager;
 import com.troy.hacjtj.base.net.Sendable;
@@ -98,23 +97,30 @@ public final class HackTJServerNet implements Runnable {
 			while (!socket.isClosed()) {
 				try {
 					Object obj = HackTJUtils.getKryo().readClassAndObject(in);
-					System.out.println("Read object! " + obj);
 					assert obj instanceof PacketData;
 					recieverManager.onRecieve(client, (PacketData) obj);
 				} catch (Exception e) {
-					e.printStackTrace();
+					// ignore
 				}
 			}
 			connectedList.remove(client);
-			in.close();
-			client.disconnect();
+			try {
+				in.close();
+			} catch (Exception e) {
+			}
+			try {
+				client.disconnect();
+			} catch (Exception e) {
+			}
 			logger.info("Ending client socket thread");
 		}
 	};
 
 	public void cleanUp() {
-		for (Client client : connectedList)
-			client.disconnect();
+		shutdown();
+		for (int i = 0; i < connectedList.size(); i++) {
+			connectedList.get(i).disconnect();
+		}
 
 		try {
 			socket.close();
@@ -124,7 +130,6 @@ public final class HackTJServerNet implements Runnable {
 	}
 
 	public class DisconnectHandler extends PacketDataReceiver<Disconnect> {
-
 		@Override
 		public void onReceive(Sendable sender, Disconnect data) {
 			sender.disconnect();
@@ -169,9 +174,9 @@ public final class HackTJServerNet implements Runnable {
 			String username = new String(data.getUsername()), email = new String(data.getEmail());
 			if (server.containsUser(username)) {
 				sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_USERNAME_IN_USE));
+				logger.info("Register fail username in use: " + username);
 			} else {
-				for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class)
-						.getAll()) {
+				for (DatabaseAccount account : server.getAccounts()) {
 					if (account.getAccount().getEmail().equals(email)) {
 						sender.sendResponse(new RegisterReply(RegisterReplyEnum.REGISTER_FAIL_EMAIL_IN_USE));
 						logger.info("Email in use " + username + ", em " + email);
@@ -185,7 +190,7 @@ public final class HackTJServerNet implements Runnable {
 		}
 
 	}
-	
+
 	public void shutdown() {
 		running = false;
 	}

@@ -1,0 +1,122 @@
+package com.troy.hacktj.server.net;
+
+import java.beans.*;
+import java.io.*;
+import java.net.*;
+
+import org.apache.logging.log4j.*;
+
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.troy.hacjtj.base.*;
+import com.troy.hacjtj.base.net.Sendable;
+import com.troy.hacjtj.base.packet.Disconnect;
+import com.troy.hacktj.server.database.DatabaseAccount;
+
+/**
+ * Represents a client that is currently connected to the server
+ * 
+ * @author Troy Neubauer
+ *
+ */
+public class Client implements Sendable<DatabaseAccount> {
+	private static final Logger logger = LogManager.getLogger();
+
+	public static enum ConnectionState {
+		WAITING_FOR_LOGIN, LOGED_IN, DISCONNECTED;
+	}
+
+	private Thread thread;
+	private Socket socket;
+	private SocketAddress address;
+	private volatile DatabaseAccount account;
+	private volatile ConnectionState state;
+	private Input in;
+	private Output out;
+
+	public Client(Thread thread, Socket socket, DatabaseAccount account) {
+		this(thread, socket, socket.getRemoteSocketAddress(), account, ConnectionState.LOGED_IN);
+	}
+
+	public Client(Thread thread, Socket socket) {
+		this(thread, socket, socket.getRemoteSocketAddress(), null, ConnectionState.WAITING_FOR_LOGIN);
+	}
+
+	public Client(Thread thread, Socket socket, SocketAddress address, DatabaseAccount account, ConnectionState state) {
+		this.thread = thread;
+		this.socket = socket;
+		this.address = address;
+		this.account = account;
+		this.state = state;
+		try {
+			this.in = new Input(socket.getInputStream());
+			this.out = new Output(socket.getOutputStream());
+		} catch (IOException e) {
+			logger.catching(e);
+			e.printStackTrace();
+		}
+	}
+
+	public DatabaseAccount getDatabaseAccount() {
+		if (state == ConnectionState.WAITING_FOR_LOGIN || state == ConnectionState.DISCONNECTED) {
+			throw new IllegalStateException("Invalid state for obtaining account info! Current state: " + state);
+		}
+		return account;
+	}
+
+	public Account getAccount() {
+		return getDatabaseAccount().getAccount();
+	}
+
+	public SocketAddress getAddress() {
+		return address;
+	}
+
+	public ConnectionState getState() {
+		return state;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public Input getIn() {
+		return in;
+	}
+
+	public Output getOut() {
+		return out;
+	}
+
+	@Override
+	public void sendResponse(Object responce) {
+		out.writeObject(responce);
+		out.flush();
+	}
+
+	public void disconnect() {
+		if (state != ConnectionState.DISCONNECTED) {
+			try {
+				sendResponse(new Disconnect());
+				this.state = ConnectionState.DISCONNECTED;
+				socket.close();
+				logger.info("Closing socket with " + ((account == null) ? "null" : account.getAccount().username));
+				thread.interrupt();
+			} catch (Exception e) {// Ignore all
+			}
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "Client [account=" + account + ", state=" + state + "]";
+	}
+
+	@Override
+	public void setData(DatabaseAccount data) {
+		if (data != null)
+			state = ConnectionState.LOGED_IN;
+		this.account = data;
+	}
+
+}

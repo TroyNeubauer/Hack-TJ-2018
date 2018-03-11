@@ -203,6 +203,10 @@
     <orderEntry type="module" module-name="Troy Berry Core" exported="" />
     <orderEntry type="module" module-name="Hack TJ Base" exported="" />
     <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="module" module-name="Hack TJ Base" exported="" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="module" module-name="Hack TJ Base" exported="" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="log4j-api-2.9.0" level="project" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="log4j-core-2.9.0" level="project" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="jaxb2-maven-plugin-2.3.1" level="project" />

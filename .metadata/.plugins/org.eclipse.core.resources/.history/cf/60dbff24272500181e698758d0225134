@@ -1,0 +1,12 @@
+package com.troy.hacjtj.base;
+
+public class MyObjectImpl implements MyObject {
+	
+	protected long id;
+
+	@Override
+	public long getId() {
+		return id;
+	}
+
+}

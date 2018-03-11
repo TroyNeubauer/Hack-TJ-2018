@@ -1,6 +1,0 @@
-2018-03-10 19:04:41.245 [main] [INFO] com.troy.hacktj.server.Main: Starting Server
-2018-03-10 19:04:41.361 [main] [INFO] com.troy.hacktj.server.net.HackTJServerNet: Server ready to recieve connections
-2018-03-10 19:04:41.400 [main] [INFO] com.troy.hacktj.server.Server: Preparing to shutdown server
-2018-03-10 19:04:41.401 [Server main network thread] [INFO] com.troy.hacktj.server.net.HackTJServerNet: Server net thread ending
-2018-03-10 19:04:41.533 [Background Task Thread] [FATAL] com.troy.hacktj.server.Server: CURRENT IP AND CONSTANTS IP DONT MATCH!!! 151.188.227.237
-2018-03-10 19:04:41.810 [main] [INFO] com.troy.hacktj.server.Server: Server shutdown

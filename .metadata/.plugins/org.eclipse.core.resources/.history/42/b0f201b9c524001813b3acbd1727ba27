@@ -1,0 +1,10 @@
+package com.troy.hacjtj.base.account;
+
+public class Course {
+	private String name;
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+}

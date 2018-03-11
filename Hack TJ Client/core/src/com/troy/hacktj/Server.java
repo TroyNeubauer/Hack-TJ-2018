@@ -2,7 +2,7 @@ package com.troy.hacktj;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
-import com.troy.hacjtj.base.account.Account;
+import com.troy.hacjtj.base.Account;
 import com.troy.hacjtj.base.net.Sendable;
 
 import java.io.OutputStream;

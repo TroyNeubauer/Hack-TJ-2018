@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.troy.hacjtj.account.MyObject"/>
+<fullyQualifiedTypeName name="com.troy.hacjtj.base.account.MyObject"/>
+<fullyQualifiedTypeName name="com.troyberry.util.MiscUtil"/>
+<fullyQualifiedTypeName name="java.lang.ThreadLocal"/>
+<fullyQualifiedTypeName name="com.esotericsoftware.kryo.Kryo"/>
+<fullyQualifiedTypeName name="java.lang.RuntimeException"/>
+<fullyQualifiedTypeName name="com.troy.hacktj.server.ServerTypeLookupManager"/>
+<fullyQualifiedTypeName name="com.troy.hacjtj.base.account.MyObjectImpl"/>
+<fullyQualifiedTypeName name="java.util.Scanner"/>
+<fullyQualifiedTypeName name="java.lang.NullPointerException"/>
+<fullyQualifiedTypeName name="java.lang.Exception"/>
+<fullyQualifiedTypeName name="com.esotericsoftware.kryo.io.Input"/>
+<fullyQualifiedTypeName name="com.esotericsoftware.kryo.io.Output"/>
+<fullyQualifiedTypeName name="com.troy.hacjtj.base.util.HackTJUtils"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="com.troy.hacktj.server.database.DatabaseAccount"/>
+</qualifiedTypeNameHistroy>

@@ -2,7 +2,7 @@ package com.troy.hacjtj.base.net;
 
 import java.util.HashMap;
 
-import com.troy.hacjtj.base.account.SerializationManager;
+import com.troy.hacjtj.base.SerializationManager;
 import com.troy.hacjtj.base.packet.PacketData;
 
 public class RecieverManager {
@@ -30,7 +30,6 @@ public class RecieverManager {
 		PacketDataReceiver receiver = receivers.get(data.getClass());
         if (receiver == null)
 			throw new IllegalStateException("No data receiver found for class " + data.getClass() + " Avilable ones are: " + receivers.toString());
-        
 		receiver.onReceive(sender, data);
 	}
 

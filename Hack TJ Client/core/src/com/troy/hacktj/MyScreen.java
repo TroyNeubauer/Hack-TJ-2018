@@ -1,5 +1,6 @@
 package com.troy.hacktj;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,7 +13,9 @@ public class MyScreen implements Screen {
 
     public MyScreen() {
         stage = new Stage();
+        stage.setDebugAll(true);
         container = new Table(Settings.skin);
+        container.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     protected void init() {
@@ -47,7 +50,7 @@ public class MyScreen implements Screen {
 
     @Override
     public void hide() {
-        dispose();
+
     }
 
     @Override

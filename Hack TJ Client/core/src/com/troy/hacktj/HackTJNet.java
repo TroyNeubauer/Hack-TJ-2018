@@ -7,7 +7,8 @@ import com.badlogic.gdx.net.SocketHints;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.troy.hacjtj.base.account.Constants;
+import com.troy.hacjtj.base.Constants;
+import com.troy.hacjtj.base.Account;
 import com.troy.hacjtj.base.net.PacketDataReceiver;
 import com.troy.hacjtj.base.net.RecieverManager;
 import com.troy.hacjtj.base.net.Sendable;
@@ -15,9 +16,6 @@ import com.troy.hacjtj.base.packet.Disconnect;
 import com.troy.hacjtj.base.packet.LoginReply;
 import com.troy.hacjtj.base.packet.PacketData;
 import com.troy.hacjtj.base.packet.RegisterReply;
-
-import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
-import de.tomgrill.gdxdialogs.core.listener.ButtonClickListener;
 
 public class HackTJNet implements Runnable {
     private Socket socket;
@@ -49,6 +47,7 @@ public class HackTJNet implements Runnable {
         while(!shouldDisconnect) {
             connect();
             if(socket == null) continue;
+            System.out.println("CONNECTED!!!");
             Server server = new Server(socket.getOutputStream());
             while (socket.isConnected()) {
                 try {
@@ -77,24 +76,11 @@ public class HackTJNet implements Runnable {
                     public void run() {
                         HackTJ.getInstance().setAccount(data.getAccount());
                         HackTJ.getInstance().getScreen().dispose();
-                        //Set screen
+                        HackTJ.getInstance().setScreen(HackTJ.getInstance().getScreens());
                     }
                 });
             } else {
-                final GDXButtonDialog warningDialog = HackTJ.getInstance().getDialogs().newDialog(GDXButtonDialog.class);
-                warningDialog.setTitle("Invalid credentals!").setMessage(data.toString());
-                warningDialog.addButton("Ok");
-                warningDialog.addButton("Reset Password");
-                warningDialog.setClickListener(new ButtonClickListener() {
-                    @Override
-                    public void click(int button) {
-                        warningDialog.dismiss();
-                        if(button == 1) {//They clicked reset password
-                            //Show reset password screen
-                        }
-                    }
-                });
-                warningDialog.build().show();
+                HackTJ.showInfoMessage("Invalid credentals!", data.toString());
             }
         }
 

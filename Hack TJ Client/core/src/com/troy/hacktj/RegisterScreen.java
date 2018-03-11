@@ -21,7 +21,6 @@ public class RegisterScreen extends MyScreen {
     private Label label;
 
     public RegisterScreen(final String username) {
-
         this.usernameField = new TextField(username, Settings.skin);
         usernameField.setMessageText("Username");
 
@@ -52,7 +51,6 @@ public class RegisterScreen extends MyScreen {
         container.add(" ").row();
         container.add(" ").row();
         container.add(" ").row();
-
         init();
 
         Gdx.input.setInputProcessor(stage);
@@ -62,12 +60,12 @@ public class RegisterScreen extends MyScreen {
             public void clicked(InputEvent event, float x, float y) {
             HackTJNet net = HackTJ.getInstance().getNet();
             if (net.isConnected()) {
-                net.write(new RegisterData(usernameField.getText().toCharArray(), passwordField.getText().toCharArray(), emailField.getText().toCharArray()));
-                System.out.println("sent register to server " + usernameField.getText() + ", " + passwordField.getText());
+                RegisterData data = new RegisterData(usernameField.getText().toCharArray(), passwordField.getText().toCharArray(), emailField.getText().toCharArray());
+                net.write(data);
+                System.out.println("sent register to server " + data);
             } else {
                 HackTJ.showInfoMessage("No connection!", "Check your internet connection or try again later!");
             }
-
             }
         });
 

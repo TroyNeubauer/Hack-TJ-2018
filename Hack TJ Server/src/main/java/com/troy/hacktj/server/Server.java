@@ -1,36 +1,43 @@
 package com.troy.hacktj.server;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import com.troy.hacjtj.base.account.*;
-import com.troy.hacjtj.base.util.*;
-import com.troy.hacktj.server.commands.*;
+import com.troy.hacjtj.base.Account;
+import com.troy.hacjtj.base.Constants;
+import com.troy.hacjtj.base.SerializationManager;
+import com.troy.hacjtj.base.util.Settings;
+import com.troy.hacktj.server.commands.BackgroundTaskManager;
+import com.troy.hacktj.server.commands.RepeatingTask;
 import com.troy.hacktj.server.database.DatabaseAccount;
 import com.troy.hacktj.server.net.HackTJServerNet;
 import com.troy.hacktj.server.secutiry.Security;
-import com.troy.hacktj.settings.*;
-import com.troyberry.util.MiscUtil;
+import com.troy.hacktj.settings.CryptoSettings;
+import com.troy.hacktj.settings.ServerSettings;
 
 public class Server {
 
 	private static final Logger logger = LogManager.getLogger(Server.class);
 
-	private ServerTypeLookupManager manager;
+	private List<DatabaseAccount> accounts = new ArrayList<DatabaseAccount>();
 	private HackTJServerNet net;
 	private ServerSettings settings;
 
-	private static final File DATABASE_FILE = new File("./database.hacktj");
 	private static final File SETTINGS_FILE = new File("./settings.hacktj");
 
 	public Server() {
 		Main.serverAccess = this;
 		try {
-			manager = ServerTypeLookupManager.createOrLoad(DATABASE_FILE);
+			
 			settings = SETTINGS_FILE.exists() ? SerializationManager.readObject0(SETTINGS_FILE, ServerSettings.class) : new ServerSettings();
 		} catch (Exception e) {
 			logger.fatal("Unable to initalize server!");
@@ -52,21 +59,11 @@ public class Server {
 			}
 
 		}));
-
-		BackgroundTaskManager.addTask(new RepeatingTask(TimeUnit.MINUTES.toMillis(1), () -> {
-			try {
-				manager.cleanUp();
-			} catch (Exception e) {
-				logger.warn("WARNING Failed to autosave:");
-				logger.warn(MiscUtil.getStackTrace(e));
-			}
-
-		}));
 		BackgroundTaskManager.start();
 	}
 
 	public boolean containsUser(String username) {
-		for (DatabaseAccount account : manager.getLookup(DatabaseAccount.class).getAll()) {
+		for (DatabaseAccount account : accounts) {
 			if (account.getAccount().getUsername().equals(username)) {
 				return true;
 			}
@@ -91,24 +88,19 @@ public class Server {
 
 	public Account registerUser(String username, char[] password, String email) {
 		DatabaseAccount result = Security.createAccount(username, password, email, this);
-		manager.getLookup(DatabaseAccount.class).add(result);
+		accounts.add(result);
 		return result.getAccount();
 	}
 
 	public boolean removeUser(String username) {
-		long id = -1;
-		for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).getAll()) {
+		for (int i = 0; i < accounts.size(); i++) {
+			DatabaseAccount account = accounts.get(i);
 			if (account.getAccount().getUsername().equals(username)) {
-				id = account.getId();
+				accounts.remove(account);
+				return true;
 			}
 		}
-		if (id == -1)
-			return false;
-		return removeUser(id);
-	}
-
-	public boolean removeUser(long id) {
-		return TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).remove(id);
+		return false;
 	}
 
 	public void shutdown() {
@@ -127,20 +119,20 @@ public class Server {
 	public void cleanUp() {
 		if (net != null)
 			net.cleanUp();
-		if (manager != null)
-			manager.cleanUp();
-		if (settings != null) {
+		//if (manager != null)
+		//	manager.cleanUp();
+		/*if (settings != null) {
 			try {
 				SerializationManager.writeObject0(settings, SETTINGS_FILE);// Save out settings
 			} catch (FileNotFoundException e) {
 			}
-		}
+		}*/
 		BackgroundTaskManager.getInstance().stop();
 
 	}
 
 	public DatabaseAccount getAccount(String username) {
-		for (DatabaseAccount account : manager.getLookup(DatabaseAccount.class).getAll()) {
+		for (DatabaseAccount account : accounts) {
 			if (account.getAccount().getUsername().equals(username))
 				return account;
 		}
@@ -153,5 +145,9 @@ public class Server {
 
 	public HackTJServerNet getNet() {
 		return net;
+	}
+	
+	public List<DatabaseAccount> getAccounts() {
+		return accounts;
 	}
 }

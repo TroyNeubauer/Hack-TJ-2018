@@ -7,9 +7,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.esotericsoftware.kryo.Kryo;
-import com.troy.hacjtj.base.account.Account;
+import com.troy.hacjtj.base.Account;
+import com.troy.hacjtj.base.Course;
+import com.troy.hacjtj.base.packet.Disconnect;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.tomgrill.gdxdialogs.core.GDXDialogs;
@@ -22,7 +25,7 @@ public class HackTJ extends Game {
     private GDXDialogs dialogs;
 	private HackTJNet net;
 	private static HackTJ instance;
-    private List<Runnable> actions = new ArrayList<Runnable>();
+    private final List<Runnable> actions = new ArrayList<Runnable>();
     private Account account = new Account(0, "Test-Username", "testemail@gmail.com");
     private ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
         @Override
@@ -31,6 +34,15 @@ public class HackTJ extends Game {
         }
     };
     private SchoolSelectBox box;
+    private MyCamera camera;
+    private SwipeScreens screens;
+
+    public HackTJ(MyCamera camera) {
+        this.camera = camera;
+        account.courses.add(new Course("English 10 Honors"));
+        account.courses.add(new Course("AP World"));
+        account.courses.add(new Course("AP CS AB"));
+    }
 	
 	@Override
 	public void create () {
@@ -38,9 +50,15 @@ public class HackTJ extends Game {
         box = new SchoolSelectBox();
         dialogs = GDXDialogsSystem.install();
 	    instance = this;
-        //setScreen(new LoginScreen());
-        setScreen(new SwipeScreens(1, new AccountSettingsScreen(), new CenterScreen(), new RecentUploadsScreen()));
+        screens = new SwipeScreens(1, new AccountSettingsScreen(), new CenterScreen(), new RecentUploadsScreen());
+        setScreen(new LoginScreen());
         this.net = new HackTJNet();
+        /*camera.takePicture(new MyCamera.PictureCallback() {
+            @Override
+            public void pictureTaken(byte[] bytes) {
+                System.out.println("Callback called! " + Arrays.toString(bytes));
+            }
+        });*/
 	}
 
     @Override
@@ -74,6 +92,11 @@ public class HackTJ extends Game {
         return net;
     }
 
+    @Override
+    public void dispose() {
+        net.write(new Disconnect());
+    }
+
     public void setAccount(Account account) {
         this.account = account;
     }
@@ -102,5 +125,13 @@ public class HackTJ extends Game {
 
     public SchoolSelectBox getSchoolSelectBox() {
         return box;
+    }
+
+    public MyCamera getCamera() {
+        return camera;
+    }
+
+    public SwipeScreens getScreens() {
+        return screens;
     }
 }

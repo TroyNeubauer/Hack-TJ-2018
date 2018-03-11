@@ -8,7 +8,7 @@ import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.logging.log4j.*;
 
-import com.troy.hacjtj.base.account.*;
+import com.troy.hacjtj.base.*;
 import com.troy.hacktj.server.Server;
 import com.troy.hacktj.server.database.DatabaseAccount;
 import com.troy.hacktj.settings.CryptoSettings;
@@ -20,6 +20,7 @@ public class Security {
 
 	private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
 	private static final SecretKeyFactory FACTORY = getAlgorithm();
+	private static int count = 0;
 
 	public static byte[] secureRandomBytes(int bytes) {
 		byte[] result = new byte[bytes];
@@ -68,14 +69,11 @@ public class Security {
 	 * @return A new unregistered DatabaseAccount
 	 */
 	public static DatabaseAccount createAccount(String username, char[] password, String email, Server server) {
-		for (DatabaseAccount account : TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).getAll()) {
-			if (account.getAccount().getUsername().equals(username)) {
-				throw new IllegalArgumentException("User with username " + username + " already exists!");
-			}
+		if (server.containsUser(username)) {
+			throw new IllegalArgumentException("User with username " + username + " already exists!");
 		}
 		CryptoSettings settings = server.getSettings().getSetting(CryptoSettings.class);
-		Account account = new Account(TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).nextUniqueID(),
-				username, email);
+		Account account = new Account(count++, username, email);
 		int iterations = settings.getNowIterations();
 		byte[] salt = Security.secureRandomBytes(settings.getSaltBytes());
 		byte[] pepper = settings.getPepper();

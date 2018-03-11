@@ -1,4 +1,4 @@
-include 'desktop', 'android', 'ios', 'html', 'core'
+include 'desktop', 'android', 'ios', 'core'
 
 include   ':Hack TJ Base'
 project(':Hack TJ Base').projectDir = new File('C:/Hack TJ/Hack TJ Base')

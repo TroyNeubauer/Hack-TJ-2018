@@ -1,0 +1,155 @@
+package com.troy.hacktj.server;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.troy.hacjtj.base.Account;
+import com.troy.hacjtj.base.Constants;
+import com.troy.hacjtj.base.SerializationManager;
+import com.troy.hacjtj.base.TypeLookupFactory;
+import com.troy.hacjtj.base.util.Settings;
+import com.troy.hacktj.server.commands.BackgroundTaskManager;
+import com.troy.hacktj.server.commands.RepeatingTask;
+import com.troy.hacktj.server.database.DatabaseAccount;
+import com.troy.hacktj.server.net.HackTJServerNet;
+import com.troy.hacktj.server.secutiry.Security;
+import com.troy.hacktj.settings.CryptoSettings;
+import com.troy.hacktj.settings.ServerSettings;
+
+public class Server {
+
+	private static final Logger logger = LogManager.getLogger(Server.class);
+
+	private List<DatabaseAccount> accounts = new ArrayList<DatabaseAccount>();
+	private HackTJServerNet net;
+	private ServerSettings settings;
+
+	private static final File SETTINGS_FILE = new File("./settings.hacktj");
+
+	public Server() {
+		Main.serverAccess = this;
+		try {
+			
+			settings = SETTINGS_FILE.exists() ? SerializationManager.readObject0(SETTINGS_FILE, ServerSettings.class) : new ServerSettings();
+		} catch (Exception e) {
+			logger.fatal("Unable to initalize server!");
+			e.printStackTrace();
+			this.forceShutdown(1);
+		}
+		this.net = new HackTJServerNet(this);
+		BackgroundTaskManager.addTask(new RepeatingTask(TimeUnit.HOURS.toMillis(2), () -> {
+			try {
+				URL whatismyip = new URL("http://checkip.amazonaws.com");
+				BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+
+				String ip = in.readLine(); // you get the IP as a String
+				if (!Constants.ADDRESS.equals(ip)) {
+					logger.fatal("CURRENT IP AND CONSTANTS IP DONT MATCH!!! " + ip);
+				}
+			} catch (Exception e) {
+				logger.warn("WARNING website down");
+			}
+
+		}));
+		BackgroundTaskManager.start();
+	}
+
+	public boolean containsUser(String username) {
+		for (DatabaseAccount account : accounts) {
+			if (account.getAccount().getUsername().equals(username)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public final DatabaseAccount areCredentialsValid(String username, char[] password) {
+		DatabaseAccount account = getAccount(username);
+		if (account == null)
+			return null;
+		CryptoSettings setting = this.settings.getSetting(CryptoSettings.class);
+		byte[] storedHash = account.getHash();
+		byte[] computedHash = Security.getHashedPassword(password, account.getSalt(), setting.getPepper(), account.getIterations(), setting.getHashBytes());
+
+		if (Arrays.equals(storedHash, computedHash)) {
+			account.onLogin(settings.getSetting(CryptoSettings.class), password);
+			return account;
+		}
+		return null;
+	}
+
+	public Account registerUser(String username, char[] password, String email) {
+		DatabaseAccount result = Security.createAccount(username, password, email, this);
+		manager.getLookup(DatabaseAccount.class).add(result);
+		return result.getAccount();
+	}
+
+	public boolean removeUser(String username) {
+		long id = -1;
+		for (DatabaseAccount account : accounts) {
+			if (account.getAccount().getUsername().equals(username)) {
+				id = account.getId();
+			}
+		}
+		if (id == -1)
+			return false;
+		return removeUser(id);
+	}
+
+	public boolean removeUser(long id) {
+		return TypeLookupFactory.getInstance().getLookup(DatabaseAccount.class).remove(id);
+	}
+
+	public void shutdown() {
+		logger.info("Preparing to shutdown server");
+		cleanUp();
+		logger.info("Server shutdown");
+	}
+
+	public void forceShutdown(int code) {
+		logger.info("Preparing to force shutdown the server");
+		cleanUp();
+		logger.info("Server shutdown");
+		System.exit(code);
+	}
+
+	public void cleanUp() {
+		if (net != null)
+			net.cleanUp();
+		//if (manager != null)
+		//	manager.cleanUp();
+		/*if (settings != null) {
+			try {
+				SerializationManager.writeObject0(settings, SETTINGS_FILE);// Save out settings
+			} catch (FileNotFoundException e) {
+			}
+		}*/
+		BackgroundTaskManager.getInstance().stop();
+
+	}
+
+	public DatabaseAccount getAccount(String username) {
+		for (DatabaseAccount account : accounts) {
+			if (account.getAccount().getUsername().equals(username))
+				return account;
+		}
+		return null;
+	}
+
+	public Settings getSettings() {
+		return settings;
+	}
+
+	public HackTJServerNet getNet() {
+		return net;
+	}
+}

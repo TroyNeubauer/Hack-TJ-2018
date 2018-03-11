@@ -6,9 +6,12 @@ import java.net.*;
 
 import org.apache.logging.log4j.*;
 
-import com.troy.hacjtj.base.account.*;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.troy.hacjtj.base.*;
 import com.troy.hacjtj.base.net.Sendable;
 import com.troy.hacjtj.base.packet.Disconnect;
+import com.troy.hacjtj.base.util.HackTJUtils;
 import com.troy.hacktj.server.database.DatabaseAccount;
 
 /**
@@ -29,8 +32,8 @@ public class Client implements Sendable<DatabaseAccount> {
 	private SocketAddress address;
 	private volatile DatabaseAccount account;
 	private volatile ConnectionState state;
-	private XMLDecoder in;
-	private XMLEncoder out;
+	private Input in;
+	private Output out;
 
 	public Client(Thread thread, Socket socket, DatabaseAccount account) {
 		this(thread, socket, socket.getRemoteSocketAddress(), account, ConnectionState.LOGED_IN);
@@ -47,8 +50,8 @@ public class Client implements Sendable<DatabaseAccount> {
 		this.account = account;
 		this.state = state;
 		try {
-			this.in = new XMLDecoder(socket.getInputStream());
-			this.out = new XMLEncoder(socket.getOutputStream());
+			this.in = new Input(socket.getInputStream());
+			this.out = new Output(socket.getOutputStream());
 		} catch (IOException e) {
 			logger.catching(e);
 			e.printStackTrace();
@@ -78,28 +81,30 @@ public class Client implements Sendable<DatabaseAccount> {
 		return socket;
 	}
 
-	public XMLDecoder getIn() {
+	public Input getIn() {
 		return in;
 	}
 
-	public XMLEncoder getOut() {
+	public Output getOut() {
 		return out;
 	}
 
 	@Override
 	public void sendResponse(Object responce) {
-		out.writeObject(responce);
+		HackTJUtils.getKryo().writeClassAndObject(out, responce);
 		out.flush();
 	}
 
 	public void disconnect() {
-		try {
-			sendResponse(new Disconnect());
-			this.state = ConnectionState.DISCONNECTED;
-			socket.close();
-			logger.info("Closing socket with " + ((account == null) ? "null" : account.getAccount().username));
-			thread.interrupt();
-		} catch (Exception e) {// Ignore all
+		if (state != ConnectionState.DISCONNECTED) {
+			try {
+				sendResponse(new Disconnect());
+				this.state = ConnectionState.DISCONNECTED;
+				socket.close();
+				logger.info("Closing socket with " + ((account == null) ? "null" : account.getAccount().username));
+				thread.interrupt();
+			} catch (Exception e) {// Ignore all
+			}
 		}
 	}
 

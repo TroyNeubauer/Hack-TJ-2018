@@ -1,0 +1,203 @@
+package com.troy.hacktj.server;
+
+import java.io.*;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.Map.Entry;
+
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.troy.hacjtj.base.account.*;
+import com.troy.hacjtj.base.util.HackTJUtils;
+import com.troy.hacktj.server.database.DatabaseAccount;
+
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+
+public class ServerTypeLookupManager extends TypeLookupFactory {
+
+	private Map<Class<? extends MyObject>, TypeLookup<?>> entries = new HashMap<Class<? extends MyObject>, TypeLookup<?>>();
+
+	private File file;
+
+	public ServerTypeLookupManager() {
+
+	}
+
+	public ServerTypeLookupManager(File file) {
+		this.file = file;
+		if (file.exists()) {
+			try (BufferedReader stream = new BufferedReader(new FileReader(file))) {
+				String line;
+				while ((line = stream.readLine()) != null) {
+					String className = line;
+					String dataFileString = stream.readLine();
+					Class<?> rawClass = Class.forName(className);
+					Class<? extends MyObject> clazz = (Class<? extends MyObject>) rawClass;
+					File dataFile = new File(dataFileString);
+					if (dataFile.exists()) {
+						Input input = new Input(new FileInputStream(dataFile));
+						entries.put(clazz, (TypeLookup<?>) HackTJUtils.getKryo().readClassAndObject(input));
+						input.close();
+					}
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public static ServerTypeLookupManager createOrLoad(File file) {
+		ServerTypeLookupManager result = new ServerTypeLookupManager(file);
+		for (String name : new FastClasspathScanner("com.troy.hacktj").scan(Math.max(1, Runtime.getRuntime().availableProcessors() / 2)).getNamesOfClassesImplementing(MyObject.class)) {
+			add(name, result);
+		}
+		for (String name : new FastClasspathScanner("com.troy.hacktj").scan(Math.max(1, Runtime.getRuntime().availableProcessors() / 2)).getNamesOfSubclassesOf(MyObjectImpl.class)) {
+			add(name, result);
+		}
+		if (!result.entries.containsKey(Account.class))
+			result.register(Account.class, new AccountLookup((TypeLookup<DatabaseAccount>) result.entries.get(DatabaseAccount.class)));
+		result.file = file;
+		TypeLookupFactory.setInstance(result);
+		return result;
+	}
+
+	private static void add(String name, ServerTypeLookupManager result) {
+		try {
+			Class clazz = Class.forName(name);
+			if (result.entries.containsKey(clazz))
+				return;
+			if (Modifier.isAbstract(clazz.getModifiers()))
+				return;
+			if (clazz.equals(Account.class))
+				return;
+			assert MyObject.class.isAssignableFrom(clazz);
+			result.register(clazz, new DefaultServerLookup());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public <T extends MyObject> TypeLookup<T> getLookup(Class<T> clazz) {
+		TypeLookup<T> result = (TypeLookup<T>) entries.get(clazz);
+		if (result == null)
+			throw new RuntimeException("Unable to find type lookup for class " + clazz + "!");
+		return result;
+	}
+
+	public <T extends MyObject> void register(Class<T> clazz, TypeLookup<T> lookup) {
+		if (entries.put(clazz, lookup) != null) {
+			System.err.println(TypeLookupFactory.class + " register just overrided a prevoius entry! new " + clazz + ", " + lookup.getClass());
+		}
+	}
+
+	public Map<Class<? extends MyObject>, TypeLookup<?>> getAll() {
+		return Collections.unmodifiableMap(entries);
+	}
+
+	public void cleanUp() {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+			for (Entry<Class<? extends MyObject>, TypeLookup<?>> entry : entries.entrySet()) {
+				if (entry.getValue().shouldSave()) {
+					File individualFile = new File(entry.getKey().getSimpleName() + "." + Constants.DEFAULT_EXTENSION);
+					Output coder = new Output(new FileOutputStream(individualFile));
+					writer.write(entry.getKey().getName());
+					writer.write('\n');
+					writer.write(individualFile.getAbsolutePath());
+					writer.write('\n');
+					System.out.println("saving " + entry.getValue());
+					HackTJUtils.getKryo().writeClassAndObject(coder, entry.getValue());
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	public static class DefaultServerLookup<T extends MyObject> implements TypeLookup<T> {
+		private HashMap<Long, T> map;
+		private long count = 1;
+
+		public DefaultServerLookup() {
+			map = new HashMap<Long, T>();
+		}
+
+		@Override
+		public T lookup(long id) {
+			return map.get(Long.valueOf(id));
+		}
+
+		@Override
+		public long nextUniqueID() {
+			return count++;
+		}
+
+		@Override
+		public void add(T t) {
+			map.put(Long.valueOf(t.getId()), t);
+		}
+
+		@Override
+		public List<T> getAll() {
+			return new ArrayList<T>(map.values());
+		}
+
+		public boolean shouldSave() {
+			return true;
+		}
+
+		@Override
+		public boolean remove(long id) {
+			return map.remove(id) != null;// We will never have null values so it remove will only return null if the user didnt exist before
+		}
+	}
+
+	public static class AccountLookup extends DefaultServerLookup<Account> {
+		private final TypeLookup<DatabaseAccount> lookup;
+
+		public AccountLookup(TypeLookup<DatabaseAccount> lookup) {
+			this.lookup = lookup;
+		}
+
+		@Override
+		public Account lookup(long id) {
+			DatabaseAccount account = lookup.lookup(id);
+			if (account == null)
+				return null;
+			return account.getAccount();
+		}
+
+		@Override
+		public long nextUniqueID() {
+			return lookup.nextUniqueID();
+		}
+
+		@Override
+		public void add(Account t) {
+			throw new RuntimeException("Cannot add account on the server! You must create a database account and add that instead!!");
+		}
+
+		@Override
+		public List<Account> getAll() {
+			List<DatabaseAccount> accounts = lookup.getAll();
+			List<Account> result = new ArrayList<Account>(accounts.size());
+			for (DatabaseAccount acc : accounts) {
+				result.add(acc.getAccount());
+			}
+			assert accounts.size() == result.size();
+			return result;
+		}
+
+		@Override
+		public boolean shouldSave() {
+			return false;// No saving this lookup since it only piggy backs off of DatabaseAccount we don't want 2 copies
+		}
+
+	}
+
+	@Override
+	public boolean hasLookup(Class<?> clazz) {
+		return entries.containsKey(clazz);
+	}
+}

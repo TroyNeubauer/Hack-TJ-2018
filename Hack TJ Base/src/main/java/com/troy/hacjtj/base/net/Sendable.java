@@ -1,6 +1,6 @@
 package com.troy.hacjtj.base.net;
 
-import com.troy.hacjtj.base.account.Account;
+import com.troy.hacjtj.base.Account;
 
 public interface Sendable<T> {
 	

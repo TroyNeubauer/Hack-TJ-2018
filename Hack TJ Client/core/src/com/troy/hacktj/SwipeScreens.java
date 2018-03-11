@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 public class SwipeScreens implements Screen {
     private MyScreen[] screens;
     private int index;
+
     private GestureDetector detector = new GestureDetector(new GestureDetector.GestureAdapter(){
         public boolean fling(float velocityX, float velocityY, int button) {
             System.out.println("fling");
@@ -78,18 +79,19 @@ public class SwipeScreens implements Screen {
         this.index = index;
     }
 
-
     private void moveScreen(boolean right) {
         int newIndex = index + (right ? -1 : +1);
         if(newIndex < 0 || newIndex >= screens.length) {
             return;
         }
         index = newIndex;
+        screens[index].resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         screens[index].show();
     }
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(detector);
         screens[index].show();
     }
 
@@ -115,7 +117,7 @@ public class SwipeScreens implements Screen {
 
     @Override
     public void hide() {
-        dispose();
+
     }
 
     @Override

@@ -55,6 +55,8 @@
     <orderEntry type="module" module-name="Troy Berry Core" scope="RUNTIME" />
     <orderEntry type="module" module-name="Troy Berry Core" exported="" />
     <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
+    <orderEntry type="module" module-name="Troy Berry Core" exported="" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="fast-classpath-scanner-2.9.4" level="project" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="hashids-1.0.3" level="project" />
     <orderEntry type="library" exported="" scope="PROVIDED" name="kryo-4.0.1" level="project" />

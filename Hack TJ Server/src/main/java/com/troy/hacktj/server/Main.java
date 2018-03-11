@@ -6,7 +6,7 @@ import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.troy.hacjtj.base.account.SerializationManager;
+import com.troy.hacjtj.base.SerializationManager;
 import com.troyberry.util.MiscUtil;
 
 public class Main {
@@ -18,7 +18,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		SerializationManager.init();
 		Server server = null;
-		Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 		try {
 			logger.info("Starting Server");
 			server = new Server();
@@ -30,6 +30,11 @@ public class Main {
 				server.forceShutdown(1);
 
 		}
+		while (true) {
+			if (scanner.next().equals("stop"))
+				break;
+		}
+
 		if (server != null)
 			server.shutdown();
 		scanner.close();

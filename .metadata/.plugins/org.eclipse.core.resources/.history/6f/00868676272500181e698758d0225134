@@ -1,0 +1,18 @@
+package com.troy.hacjtj.base;
+
+public class Course extends MyObjectImpl {
+	private String name;
+
+	public Course(long id, String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+    public String getName() {
+        return name;
+    }
+}

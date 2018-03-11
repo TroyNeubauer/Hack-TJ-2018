@@ -66,10 +66,5 @@ public class LoginScreen extends MyScreen {
                 HackTJ.getInstance().setScreen(new RegisterScreen(usernameField.getText()));
             }
         });
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-
-        }
     }
 }

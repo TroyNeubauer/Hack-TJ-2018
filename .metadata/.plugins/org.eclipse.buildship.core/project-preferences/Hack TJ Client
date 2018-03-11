@@ -1,0 +1,9 @@
+#
+#Sun Mar 11 08:56:03 EDT 2018
+linkedResources=
+managedNatures=
+classpath=<?xml version\="1.0" encoding\="UTF-8"?>\n<classpath>\n</classpath>\n
+subprojectPaths=android;core;desktop;html;ios
+derivedResources=.gradle;build;android/build;core/build;desktop/build;html/build;ios/build
+managedBuilders=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><commands/>
+buildDir=build
